@@ -1,6 +1,7 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { marked } from 'marked';
+import DragAndDropUpload from './components/DragAndDrop';
 
 
 marked.setOptions({
@@ -22,6 +23,7 @@ export default function PostEditor() {
             className="w-full h-screen p-8"
           />
         </form>
+        <DragAndDropUpload />
       </div>
       <div className="flex-1">
         <div

@@ -88,3 +88,7 @@ blockquote {
   border-left: 4px solid #ddd;
 }
 
+img {
+  max-width: 50%;
+  height: auto;
+}

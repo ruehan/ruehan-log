@@ -20,10 +20,18 @@ export default function PostEditor() {
   const handleImageUpload = (variants: any) => {
     setImageVariants(variants);
 
-    console.log(`데이터 받기 성공..! | ${variants}`)
-    const imageMarkdown = `![image](${variants})\n`;
+    if(variants.includes('stream')){
+      const imageMarkdown = `<iframe src="${variants}"></iframe>\n`;
+      setValue('markdown', markdown + imageMarkdown);
+    }else{
+      const imageMarkdown = `![image](${variants})\n`;
+      setValue('markdown', markdown + imageMarkdown);
+    }
 
-    setValue('markdown', markdown + imageMarkdown);
+    console.log(`데이터 받기 성공..! | ${variants}`)
+    
+
+    
   };
 
   const onSubmit = async (data: any) => {
@@ -50,30 +58,32 @@ export default function PostEditor() {
     }
   };
 
+  
+
   return (
     <div className="flex overflow-hidden h-screen "> 
-      <div className="flex-1 h-screen w-1/2 bg-yellow-100">
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <button type="submit" className="w-full h-12 p-8 bg-purple-100 flex justify-center items-center">포스트 생성</button>
+      <div className="flex-1 h-screen w-1/2 border-r-2">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex-1 h-screen overflow-hidden">
+          <button type="submit" className="w-full h-12 p-8 flex justify-center items-center">포스트 생성</button>
           <input 
             {...register('title')}
             placeholder='Title'
-            className="w-full h-12 p-8 overflow-scroll bg-blue-100"
+            className="w-full h-12 p-8 overflow-scroll"
           />
           <input 
             {...register('type')}
             placeholder='Type'
-            className="w-full h-12 p-8 overflow-scroll bg-orange-100"
+            className="w-full h-12 p-8 overflow-scroll"
           />
           <textarea
             {...register('markdown')}
-            className="w-full h-screen p-8 overflow-scroll"
+            className="w-full h-[calc(94vh-144px)] p-8"
           />
           
         </form>
         <DragAndDropUpload onImageUpload={handleImageUpload} />
       </div>
-      <div className="flex-1 h-screen w-1/2 bg-green-100">
+      <div className="flex-1 h-screen w-1/2">
         <div
           className="prose p-8 overflow-scroll h-full flex-rows justify-start"
           dangerouslySetInnerHTML={{ __html: marked.parse(markdown || '') }}

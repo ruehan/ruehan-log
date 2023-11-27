@@ -8,16 +8,23 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { RiMenuFoldLine as MenuFoldIcon, RiMenuUnfoldLine as MenuUnFoldIcon } from "react-icons/ri";
 
+
 const fetcher = (url: any) => fetch(url).then((res) => res.json());
 
+// const TurndownService = require('turndown');
+
 export default function Home() {
+  // const turndown = new TurndownService()
   const { data: session, status } = useSession();
   const router = useRouter();
   const { data: posts, error } = useSWR('/api/get-post', fetcher);
-  const [selectedType, setSelectedType] = useState('123');
+  const [selectedType, setSelectedType] = useState('한달간의 여행 기록');
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(0);
   const [showType, setShowType] = useState(true);
+
+  
+
 
   const paginate = (newIndex: any) => {
     setCurrent(newIndex);
@@ -124,6 +131,8 @@ export default function Home() {
 
   console.log(filteredPosts)
 
+  // console.log(turndown.turndown(filteredPosts[0].content))
+
   return (
     <>   
 
@@ -138,11 +147,11 @@ export default function Home() {
           exit="hidden"
           variants={typeVariants}
           transition={{ duration: 1 }}
-          className="flex flex-col w-36 items-center justify-center bg-yellow-100 h-3/4 overflow-scroll">      
+          className="flex flex-col w-24 items-center justify-center h-3/4 overflow-scroll">      
           {[...types].map((type: any) => (
             <motion.div 
               key={type} 
-              className="h-36 w-32  mt-4 bg-white text-center shadow-lg border rounded-md flex items-center justify-center" 
+              className="h-24 w-20  mt-4 bg-white text-center shadow-lg border rounded-md flex items-center justify-center text-sm" 
               onClick={() => onClickType(type)}
               whileHover={{scale: 1.1}}
               whileTap={{scale: 0.95}}
@@ -157,7 +166,7 @@ export default function Home() {
       )}
   
       <div className="flex w-11/12 justify-center h-3/4 overflow-hidden">
-        <div className="relative overflow-scroll w-3/4 flex flex-col justify-between items-center bg-white shadow-lg rounded-lg m-5 font-serif text-gray-800">
+        <div className="relative overflow-scroll w-3/4 flex flex-col justify-between items-center bg-white shadow-lg rounded-lg m-5  text-gray-800">
           <AnimatePresence initial={false}>
             <motion.div
               key={current}
@@ -177,7 +186,7 @@ export default function Home() {
                       <button id={filteredPosts[current].id} onClick={clickDelete} className="absolute top-5 right-5 w-12 h-12 bg-red-100 rounded-full">X</button>
                     )}
                     <div className="px-6 py-4 ">
-                      <div className="font-bold text-xl mb-2">{filteredPosts[current].title}</div>
+                      <div className="font-bold text-xl mb-2 text-blue-300">{filteredPosts[current].title}</div>
                       <div
                         className="text-gray-700 text-base"
                         dangerouslySetInnerHTML={{ __html: marked.parse(filteredPosts[current].content || '') }}

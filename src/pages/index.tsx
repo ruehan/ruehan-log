@@ -4,10 +4,8 @@ import { useRouter } from 'next/router';
 import useSWR from 'swr';
 import { marked } from 'marked';
 import {motion, AnimatePresence} from 'framer-motion'
-import Slider from 'react-slick'
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-
 
 const fetcher = (url: any) => fetch(url).then((res) => res.json());
 
@@ -31,9 +29,6 @@ export default function Home() {
     }
   }, [session, status, router]);
 
-
-
-
   if (status === 'loading' || !session) {
     return <div>Loading...</div>;
   }
@@ -42,14 +37,9 @@ export default function Home() {
     return <div>Loading...</div>
   }
 
-  
-
-  console.log(posts)
-
   const types = new Set(posts.getPost.map((post: any) => post.type));
   const filteredPosts = posts.getPost.filter((post: any) => post.type == selectedType);
   
-
   const itemVariants = {
     hidden: { scale: 0, rotate: 0 },
     visible: {
@@ -63,6 +53,11 @@ export default function Home() {
       }
     }
   };
+
+  const onClickType = (type: any) => {
+    setSelectedType(type)
+    setCurrent(0)
+  }
 
   const variants = {
     enter: (direction: any) => {
@@ -93,6 +88,10 @@ export default function Home() {
     slidesToScroll: 1,
   }
 
+  if(!filteredPosts){
+    return <div>filteredPosts is Loading...</div>
+  }
+
   return (
     <>
       
@@ -103,7 +102,7 @@ export default function Home() {
           <motion.div 
             key={type} 
             className="h-36 w-32 bg-gray-100 mt-4 bg-white text-center  shadow-lg border rounded-md flex items-center justify-center" 
-            onClick={() => setSelectedType(type)}
+            onClick={() => onClickType(type)}
             whileHover={{scale: 1.1}}
             whileTap={{scale: 0.95}}
             variants={itemVariants}
@@ -126,7 +125,7 @@ export default function Home() {
               animate="center"
               exit="exit"
               transition={{
-                x: { type: "spring", stiffness: 300, damping: 30 },
+                // x: { type: "spring", stiffness: 300, damping: 30 },
                 opacity: { duration: 0.2 }
               }}>
                 {

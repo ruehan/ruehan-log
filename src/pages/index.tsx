@@ -6,6 +6,7 @@ import { marked } from 'marked';
 import {motion, AnimatePresence} from 'framer-motion'
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { RiMenuFoldLine as MenuFoldIcon, RiMenuUnfoldLine as MenuUnFoldIcon } from "react-icons/ri";
 
 const fetcher = (url: any) => fetch(url).then((res) => res.json());
 
@@ -16,6 +17,7 @@ export default function Home() {
   const [selectedType, setSelectedType] = useState('테스트');
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(0);
+  const [showType, setShowType] = useState(true);
 
   const paginate = (newIndex: any) => {
     setCurrent(newIndex);
@@ -25,13 +27,13 @@ export default function Home() {
   useEffect(() => {
     console.log(session)
     if (status !== 'loading' && !session) {
-      // signIn();
+      // router.push('/login')
     }
   }, [session, status, router]);
 
-  if (status === 'loading' || !session) {
-    return <div>Loading...</div>;
-  }
+  // if (status === 'loading' || !session) {
+  //   return <div>Loading...</div>;
+  // }
 
   if(!posts){
     return <div>Loading...</div>
@@ -59,6 +61,10 @@ export default function Home() {
     setCurrent(0)
   }
 
+  const toggleTypes = () => {
+    setShowType(!showType);
+  };
+
   const variants = {
     enter: (direction: any) => {
       return {
@@ -81,6 +87,12 @@ export default function Home() {
     }
   };
 
+  const typeVariants = {
+    hidden: { opacity: 0, x: -300 },
+    visible: { opacity: 1, x: 0 }
+  };
+
+
   const settings = {
     dots: true,
     infinite: true,
@@ -95,26 +107,39 @@ export default function Home() {
 
   return (
     <>   
-    <div className="flex w-full items-center justify-center" style={{height: '100vh'}}>
-      <motion.div 
-        className="flex flex-col w-36 items-center">      
-        {[...types].map((type: any) => (
-          <motion.div 
-            key={type} 
-            className="h-36 w-32  mt-4 bg-white text-center shadow-lg border rounded-md flex items-center justify-center" 
-            onClick={() => onClickType(type)}
-            whileHover={{scale: 1.1}}
-            whileTap={{scale: 0.95}}
-            variants={itemVariants}
-            initial="hidden"
-            animate="visible"
-            >{type}
-          </motion.div>
-        ))}
 
-      </motion.div>
+      
+
+    <div className="flex w-full items-center justify-center" style={{height: '100vh'}}>
+      <button onClick={toggleTypes} className="fixed top-10 left-10 text-4xl bg-gray-500 text-white rounded-full">
+        {showType ? <MenuFoldIcon /> : <MenuUnFoldIcon />}
+      </button>
+      {showType && (
+        <motion.div 
+          initial="hidden"
+          animate="visible"
+          exit="hidden"
+          variants={typeVariants}
+          transition={{ duration: 1 }}
+          className="flex flex-col w-36 items-center">      
+          {[...types].map((type: any) => (
+            <motion.div 
+              key={type} 
+              className="h-36 w-32  mt-4 bg-white text-center shadow-lg border rounded-md flex items-center justify-center" 
+              onClick={() => onClickType(type)}
+              whileHover={{scale: 1.1}}
+              whileTap={{scale: 0.95}}
+              variants={itemVariants}
+              initial="hidden"
+              animate="visible"
+              >{type}
+            </motion.div>
+          ))}
+
+        </motion.div>
+      )}
   
-      <div className="flex w-5/6 justify-center h-3/4 overflow-hidden">
+      <div className="flex w-11/12 justify-center h-3/4 overflow-hidden">
         <div className="relative overflow-scroll w-3/4 flex flex-col justify-between items-center bg-white shadow-lg rounded-lg m-5 font-serif text-gray-800">
           <AnimatePresence initial={false}>
             <motion.div
@@ -131,7 +156,7 @@ export default function Home() {
               style={{position: 'absolute', width: '100%'}}>
                 {
                   <div key={filteredPosts[current].id} className="">
-                    <div className="px-6 py-4 bg-blue-100">
+                    <div className="px-6 py-4 ">
                       <div className="font-bold text-xl mb-2">{filteredPosts[current].title}</div>
                       <div
                         className="text-gray-700 text-base"

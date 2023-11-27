@@ -51,9 +51,8 @@ const DragAndDropUpload = ({ onImageUpload  }) => {
 
   return (
     <div
-      className={`drop-area ${highlight ? 'border-blue-300' : ''} w-48 h-screen border-2 border-yellow-200  flex justify-center items-center absolute top-0 right-0`}
+      className={`drop-area ${highlight ? 'border-blue-300' : ''} w-48 h-48 border-2 flex justify-center items-center absolute bottom-0 right-0 backdrop-blur-[calc(1px)]`}
       onDragOver={onDragOver}
-      onDragLeave={onDragLeave}
       onDrop={onDrop}
     >
       <p className="text-xs">파일을 드래그하여 업로드하세요.</p>

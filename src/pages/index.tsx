@@ -63,7 +63,8 @@ export default function Home() {
     enter: (direction: any) => {
       return {
         x: direction === 0 ? -1000 : 1000,
-        opacity: 0
+        opacity: 0,
+        zIndex: 0,
       };
     },
     center: {
@@ -114,7 +115,7 @@ export default function Home() {
       </motion.div>
   
       <div className="flex w-5/6 justify-center h-3/4 overflow-hidden">
-        <div className="relative overflow-scroll w-3/4 flex flex-col justify-between items-center bg-white shadow-lg rounded-lg p-5 m-5 font-serif text-gray-800">
+        <div className="relative overflow-scroll w-3/4 flex flex-col justify-between items-center bg-white shadow-lg rounded-lg m-5 font-serif text-gray-800">
           <AnimatePresence initial={false}>
             <motion.div
               key={current}
@@ -125,8 +126,9 @@ export default function Home() {
               exit="exit"
               transition={{
                 // x: { type: "spring", stiffness: 300, damping: 30 },
-                opacity: { duration: 0.2 }
-              }}>
+                opacity: { duration: .25 }
+              }}
+              style={{position: 'absolute', width: '100%'}}>
                 {
                   <div key={filteredPosts[current].id} className="">
                     <div className="px-6 py-4 bg-blue-100">

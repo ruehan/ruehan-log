@@ -41,8 +41,15 @@ const DragAndDropUpload = ({ onImageUpload  }) => {
         const data = await response.json();
         console.log('업로드 성공:', data);
         if(data){
-          setVariants(data.variants[0]);
-          onImageUpload(data.variants[0]);
+          try{
+            setVariants(data.variants[0]);
+            onImageUpload(data.variants[0]);
+          }catch{
+            console.log(data.preview)
+            setVariants(data.preview);
+            onImageUpload(data.preview);
+          }
+          
         }
       } catch (error) {
         console.error('업로드 중 에러 발생:', error);

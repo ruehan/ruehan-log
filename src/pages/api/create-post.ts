@@ -13,7 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const newPost = await prisma.post.create({
           data: {
             title: title,
-            content: marked.parse(markdown),
+            content: markdown,
             type: type,
             authorId: userId,
           },

@@ -93,15 +93,14 @@ export default function Home() {
   }
 
   return (
-    <>
-      
-    <div className="flex w-full items-center justify-center bg-red-100" style={{height: '100vh'}}>
+    <>   
+    <div className="flex w-full items-center justify-center" style={{height: '100vh'}}>
       <motion.div 
-        className="flex flex-col w-36 items-center bg-yellow-100">      
+        className="flex flex-col w-36 items-center">      
         {[...types].map((type: any) => (
           <motion.div 
             key={type} 
-            className="h-36 w-32 bg-gray-100 mt-4 bg-white text-center  shadow-lg border rounded-md flex items-center justify-center" 
+            className="h-36 w-32  mt-4 bg-white text-center shadow-lg border rounded-md flex items-center justify-center" 
             onClick={() => onClickType(type)}
             whileHover={{scale: 1.1}}
             whileTap={{scale: 0.95}}
@@ -114,8 +113,8 @@ export default function Home() {
 
       </motion.div>
   
-      <div className="flex w-5/6 justify-center h-3/4 bg-blue-100 overflow-hidden">
-        <div className="relative bg-white overflow-scroll w-3/4 flex flex-col justify-between items-center">
+      <div className="flex w-5/6 justify-center h-3/4 overflow-hidden">
+        <div className="relative overflow-scroll w-3/4 flex flex-col justify-between items-center bg-white shadow-lg rounded-lg p-5 m-5 font-serif text-gray-800">
           <AnimatePresence initial={false}>
             <motion.div
               key={current}
@@ -130,7 +129,7 @@ export default function Home() {
               }}>
                 {
                   <div key={filteredPosts[current].id} className="">
-                    <div className="px-6 py-4">
+                    <div className="px-6 py-4 bg-blue-100">
                       <div className="font-bold text-xl mb-2">{filteredPosts[current].title}</div>
                       <div
                         className="text-gray-700 text-base"
@@ -142,7 +141,7 @@ export default function Home() {
 
             </motion.div>
           </AnimatePresence>
-          <div className="w-3/4 flex justify-around fixed bottom-5 ">
+          <div className="w-1/3 flex justify-around fixed bottom-5 ">
             <button onClick={() => 
               paginate((current - 1 + filteredPosts.length) % filteredPosts.length)}>이전</button>
             {current + 1}

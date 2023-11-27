@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSession, signIn } from 'next-auth/react';
 import { useRouter } from 'next/router';
-import useSWR from 'swr';
+import useSWR, { mutate } from 'swr';
 import { marked } from 'marked';
 import {motion, AnimatePresence} from 'framer-motion'
 import "slick-carousel/slick/slick.css";
@@ -14,7 +14,7 @@ export default function Home() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const { data: posts, error } = useSWR('/api/get-post', fetcher);
-  const [selectedType, setSelectedType] = useState('테스트');
+  const [selectedType, setSelectedType] = useState('123');
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(0);
   const [showType, setShowType] = useState(true);
@@ -101,14 +101,31 @@ export default function Home() {
     slidesToScroll: 1,
   }
 
+  const requestUpdate = async (id: any) => {
+    await fetch('/api/delete-post', {
+      method: 'POST',
+      body: JSON.stringify({ postId : id}),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  }
+
+  const clickDelete = async (e: any) => {
+    await requestUpdate(e.target.id) 
+
+    setCurrent(0)
+    mutate('/api/get-post')  
+  }
+
   if(!filteredPosts){
     return <div>filteredPosts is Loading...</div>
   }
 
+  console.log(filteredPosts)
+
   return (
     <>   
-
-      
 
     <div className="flex w-full items-center justify-center" style={{height: '100vh'}}>
       <button onClick={toggleTypes} className="fixed top-10 left-10 text-4xl bg-gray-500 text-white rounded-full">
@@ -121,7 +138,7 @@ export default function Home() {
           exit="hidden"
           variants={typeVariants}
           transition={{ duration: 1 }}
-          className="flex flex-col w-36 items-center">      
+          className="flex flex-col w-36 items-center justify-center bg-yellow-100 h-3/4 overflow-scroll">      
           {[...types].map((type: any) => (
             <motion.div 
               key={type} 
@@ -155,7 +172,10 @@ export default function Home() {
               }}
               style={{position: 'absolute', width: '100%'}}>
                 {
-                  <div key={filteredPosts[current].id} className="">
+                  <div key={filteredPosts[current].id} className="relative">
+                    {session && (
+                      <button id={filteredPosts[current].id} onClick={clickDelete} className="absolute top-5 right-5 w-12 h-12 bg-red-100 rounded-full">X</button>
+                    )}
                     <div className="px-6 py-4 ">
                       <div className="font-bold text-xl mb-2">{filteredPosts[current].title}</div>
                       <div

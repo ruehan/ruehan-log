@@ -51,7 +51,7 @@ export default function PostEditor() {
   };
 
   return (
-    <div className="flex overflow-hidden h-screen -m-6"> 
+    <div className="flex overflow-hidden h-screen "> 
       <div className="flex-1 h-screen w-1/2 bg-yellow-100">
         <form onSubmit={handleSubmit(onSubmit)}>
           <button type="submit" className="w-full h-12 p-8 bg-purple-100 flex justify-center items-center">포스트 생성</button>

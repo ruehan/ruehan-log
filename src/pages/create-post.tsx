@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { marked } from 'marked';
 import DragAndDropUpload from './components/DragAndDrop';
@@ -16,12 +16,42 @@ export default function PostEditor() {
   const [imageVariants, setImageVariants] = useState("");
   let markdown = watch('markdown');
   const router = useRouter();
+  const [suggestions, setSuggestions] = useState([]);
+  const textAreaRef = useRef(null);
+
+  useEffect(() => {
+    const handleKeyUp = (event) => {
+      try {
+        const cursorPosition = event.target.selectionStart;
+        const textBeforeCursor = markdown.substring(0, cursorPosition);
+        // const lastWord = textBeforeCursor.split(" ").pop();
+        const lastWord = textBeforeCursor.split(/\s+/).pop();
+
+        console.log(cursorPosition + ' | ' + lastWord + ' | ' + lastWord.startsWith("*"))
+        
+  
+        if (lastWord.startsWith("*")) {
+          setSuggestions(["**", "****"]);
+        } else if (lastWord.startsWith(">")) {
+          setSuggestions([">****", ">**``````**"]);
+        } else {
+          setSuggestions([]);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+  
+    document.addEventListener('keyup', handleKeyUp);
+    return () => document.removeEventListener('keyup', handleKeyUp);
+  }, [markdown]); // 'markdown'의 변경을 추적
+
 
   const handleImageUpload = (variants: any) => {
     setImageVariants(variants);
 
     if(variants.includes('stream')){
-      const imageMarkdown = `<iframe src="${variants}"></iframe>\n`;
+      const imageMarkdown = `<iframe src="${variants}"></iframe><br>\n`;
       setValue('markdown', markdown + imageMarkdown);
     }else{
       const imageMarkdown = `![image](${variants})\n`;
@@ -29,9 +59,7 @@ export default function PostEditor() {
     }
 
     console.log(`데이터 받기 성공..! | ${variants}`)
-    
-
-    
+  
   };
 
   const onSubmit = async (data: any) => {
@@ -58,7 +86,32 @@ export default function PostEditor() {
     }
   };
 
+  const handleKeyDown = (event: any) => {
+    if (event.key === 'Enter') {
+      // 엔터 키 처리 로직
+      // setValue('markdown', markdown + " <br>");
+    } else if (event.key === 'Tab') {
+      // 탭 키 처리 로직
+      event.preventDefault(); // 기본 탭 키 동작 방지
+      setValue('markdown', markdown + "\t"); // 현재 커서 위치에 탭 문자 추가
+    }
+
+    if (suggestions.length > 0 && event.key >= '1' && event.key <= '9') {
+      console.log(suggestions)
+      event.preventDefault(); // 기본 키보드 이벤트 방지
+      const index = parseInt(event.key, 10) - 1;
+      if (index < suggestions.length) {
+        applySuggestion(suggestions[index]);
+        setSuggestions([]);
+      }
+    }
+  };
   
+  const applySuggestion = (suggestion) => {
+    // setContent(content + suggestion);
+    setValue('markdown', markdown.substring(0, markdown.length - 1) + suggestion);
+    
+  };
 
   return (
     <div className="flex overflow-hidden h-screen "> 
@@ -78,7 +131,20 @@ export default function PostEditor() {
           <textarea
             {...register('markdown')}
             className="w-full h-[calc(94vh-144px)] p-8"
+            onKeyDown={handleKeyDown}
+            // onChange={(e) => setContent(e.target.value)}
+            // onKeyUp={handleKeyUp}
+            
           />
+          {suggestions.length > 0 && (
+            <ul className="fixed top-0 right-0">
+              {suggestions.map((suggestion, index) => (
+                <li key={index} >
+                  {suggestion}
+                </li>
+              ))}
+            </ul>
+          )}
           
         </form>
         <DragAndDropUpload onImageUpload={handleImageUpload} />

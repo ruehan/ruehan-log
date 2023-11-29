@@ -7,6 +7,7 @@ import {motion, AnimatePresence} from 'framer-motion'
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { RiMenuFoldLine as MenuFoldIcon, RiMenuUnfoldLine as MenuUnFoldIcon } from "react-icons/ri";
+import ReactPlayer from 'react-player';
 
 
 const fetcher = (url: any) => fetch(url).then((res) => res.json());
@@ -22,13 +23,14 @@ export default function Home() {
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(0);
   const [showType, setShowType] = useState(true);
-
+  const contentRef = useRef(null);
   
 
 
   const paginate = (newIndex: any) => {
     setCurrent(newIndex);
     setDirection(newIndex > current ? 1 : 0);
+
   }
 
   useEffect(() => {
@@ -41,6 +43,14 @@ export default function Home() {
   // if (status === 'loading' || !session) {
   //   return <div>Loading...</div>;
   // }
+
+  useEffect(() => {
+    // 스크롤 위치를 상단으로 이동
+    const element = document.getElementById('container');
+    if (element) {
+      element.scrollTop = 0;
+    }
+  }, [current]); // 'current'가 변경될 때마다 실행
 
   if(!posts){
     return <div>Loading...</div>
@@ -135,7 +145,6 @@ export default function Home() {
 
   return (
     <>   
-
     <div className="flex w-full items-center justify-center" style={{height: '100vh'}}>
       <button onClick={toggleTypes} className="fixed top-10 left-10 text-4xl bg-gray-500 text-white rounded-full">
         {showType ? <MenuFoldIcon /> : <MenuUnFoldIcon />}
@@ -165,8 +174,8 @@ export default function Home() {
         </motion.div>
       )}
   
-      <div className="flex w-11/12 justify-center h-3/4 overflow-hidden">
-        <div className="relative overflow-scroll w-3/4 flex flex-col justify-between items-center bg-white shadow-lg rounded-lg m-5  text-gray-800">
+      <div className="flex w-5/6 justify-center h-3/4 overflow-hidden " >
+        <div id="container" className="relative overflow-scroll w-3/4 flex flex-col justify-between items-center bg-white shadow-lg rounded-lg m-5  text-gray-800">
           <AnimatePresence initial={false}>
             <motion.div
               key={current}
@@ -179,9 +188,10 @@ export default function Home() {
                 // x: { type: "spring", stiffness: 300, damping: 30 },
                 opacity: { duration: .25 }
               }}
+              
               style={{position: 'absolute', width: '100%'}}>
                 {
-                  <div key={filteredPosts[current].id} className="relative">
+                  <div key={filteredPosts[current].id} className="relative" >
                     {session && (
                       <button id={filteredPosts[current].id} onClick={clickDelete} className="absolute top-5 right-5 w-12 h-12 bg-red-100 rounded-full">X</button>
                     )}

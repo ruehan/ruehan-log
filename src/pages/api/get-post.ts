@@ -10,12 +10,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
         // const userId = 1; // 로그인한 사용자의 ID
 
-        const getPost = await prisma.post.findMany({
-        });
+        const getPost = await prisma.post.findMany({});
 
       res.status(201).json({ message: '포스트를 불러왔습니다.', getPost });
     } catch (error) {
       res.status(500).json({ message: '포스트를 불러오는 중 에러가 발생했습니다.' });
     }
+  }else if(req.method == 'POST'){
+    const { postId } = req.body;
+    try {
+      const getPost = await prisma.post.findMany({
+        where: {
+          id: parseInt(postId)
+        }
+      });
+
+    res.status(201).json({ message: '포스트를 불러왔습니다.', getPost });
+  } catch (error) {
+    res.status(500).json({ message: '포스트를 불러오는 중 에러가 발생했습니다.' });
+  }
   }
 }

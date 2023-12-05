@@ -135,6 +135,10 @@ export default function Home() {
     mutate('/api/get-post')  
   }
 
+  const clickEdit = async (e: any) => {
+    router.push(`/edit-post/${e.target.id}`)
+  }
+
   if(!filteredPosts){
     return <div>filteredPosts is Loading...</div>
   }
@@ -193,8 +197,10 @@ export default function Home() {
                 {
                   <div key={filteredPosts[current].id} className="relative" >
                     {session && (
-                      <button id={filteredPosts[current].id} onClick={clickDelete} className="absolute top-5 right-5 w-12 h-12 bg-red-100 rounded-full">X</button>
-                    )}
+                      <>                      
+                        <button id={filteredPosts[current].id} onClick={clickDelete} className="absolute top-5 right-5 w-12 h-12 bg-red-100 rounded-full">X</button>
+                        <button id={filteredPosts[current].id} onClick={clickEdit} className="absolute top-20 right-5 w-12 h-12 bg-blue-100 rounded-full">Edit</button></>
+                )}
                     <div className="px-6 py-4 ">
                       <div className="font-bold text-xl mb-2 text-blue-300">{filteredPosts[current].title}</div>
                       <div

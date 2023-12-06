@@ -8,6 +8,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { RiMenuFoldLine as MenuFoldIcon, RiMenuUnfoldLine as MenuUnFoldIcon } from "react-icons/ri";
 import ReactPlayer from 'react-player';
+import LoadingComponent from './components/Loader';
 
 
 const fetcher = (url: any) => fetch(url).then((res) => res.json());
@@ -53,11 +54,12 @@ export default function Home() {
   }, [current]); // 'current'가 변경될 때마다 실행
 
   if(!posts){
-    return <div>Loading...</div>
+    return <LoadingComponent />
   }
 
   const types = new Set(posts.getPost.map((post: any) => post.type));
   const filteredPosts = posts.getPost.filter((post: any) => post.type == selectedType);
+  const titles = filteredPosts.map((post) => post.title);
   
   const itemVariants = {
     hidden: { scale: 0, rotate: 0 },
@@ -70,7 +72,23 @@ export default function Home() {
         damping: 20,
         duration: .75
       }
+    },
+    exit: {
+      scale: 0,
+      rotate: -360,
+      transition: {
+        type: "tween",
+        stiffness: 260,
+        damping: 20,
+        duration: .75
+      }
     }
+  };
+
+  const typeVariants = {
+    hidden: { opacity: 0, x: -300 },
+    visible: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: -300, rotate: 180 },
   };
 
   const onClickType = (type: any) => {
@@ -104,19 +122,9 @@ export default function Home() {
     }
   };
 
-  const typeVariants = {
-    hidden: { opacity: 0, x: -300 },
-    visible: { opacity: 1, x: 0 }
-  };
 
 
-  const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-  }
+
 
   const requestUpdate = async (id: any) => {
     await fetch('/api/delete-post', {
@@ -140,7 +148,7 @@ export default function Home() {
   }
 
   if(!filteredPosts){
-    return <div>filteredPosts is Loading...</div>
+    return <LoadingComponent />
   }
 
   console.log(filteredPosts)
@@ -149,36 +157,62 @@ export default function Home() {
 
   return (
     <>   
-    <div className="flex w-full items-center justify-center" style={{height: '100vh'}}>
+    <div className="flex w-full justify-center " style={{height: '100vh'}}>
       <button onClick={toggleTypes} className="fixed top-10 left-10 text-4xl bg-gray-500 text-white rounded-full">
         {showType ? <MenuFoldIcon /> : <MenuUnFoldIcon />}
       </button>
       {showType && (
-        <motion.div 
+        <div className="flex ml-8">
+          <motion.div 
           initial="hidden"
           animate="visible"
-          exit="hidden"
+          exit="exit"
           variants={typeVariants}
           transition={{ duration: 1 }}
-          className="flex flex-col w-24 items-center justify-center h-3/4 overflow-scroll">      
+          className="flex flex-col w-40  justify-center h-3/4 overflow-scroll">      
           {[...types].map((type: any) => (
             <motion.div 
               key={type} 
-              className="h-24 w-20  mt-4 bg-white text-center shadow-lg border rounded-md flex items-center justify-center text-sm" 
+              // className="h-24 w-20  mt-4 bg-white text-center shadow-lg border rounded-md flex items-center justify-center text-sm" 
+              className={`p-2 ${type === selectedType ? 'text-blue-500 font-bold' : 'text-gray-700'}`}
               onClick={() => onClickType(type)}
               whileHover={{scale: 1.1}}
               whileTap={{scale: 0.95}}
               variants={itemVariants}
               initial="hidden"
               animate="visible"
+              exit="exit"
               >{type}
             </motion.div>
           ))}
-
         </motion.div>
+        <motion.div 
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+        variants={typeVariants}
+        transition={{ duration: 1 }}
+        className="flex flex-col w-40  justify-center h-3/4 overflow-scroll">
+        {titles.map((title: any, index: any) => (
+          <motion.div
+            variants={itemVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            whileHover={{scale: 1.1}}
+            whileTap={{scale: 0.95}}
+            key={title}
+            className={`p-2 ${index === current ? 'text-blue-500 font-bold' : 'text-gray-700'}`}
+            onClick={() => paginate(index)}
+          >
+            {title}
+          </motion.div>
+        ))}
+      </motion.div>
+        </div>
       )}
   
-      <div className="flex w-5/6 justify-center h-3/4 overflow-hidden " >
+      <div className="flex w-full justify-center h-full overflow-hidden " >
         <div id="container" className="relative overflow-scroll w-3/4 flex flex-col justify-between items-center bg-white shadow-lg rounded-lg m-5  text-gray-800">
           <AnimatePresence initial={false}>
             <motion.div
@@ -201,7 +235,7 @@ export default function Home() {
                         <button id={filteredPosts[current].id} onClick={clickDelete} className="absolute top-5 right-5 w-12 h-12 bg-red-100 rounded-full">X</button>
                         <button id={filteredPosts[current].id} onClick={clickEdit} className="absolute top-20 right-5 w-12 h-12 bg-blue-100 rounded-full">Edit</button></>
                 )}
-                    <div className="px-6 py-4 ">
+                    <div className="px-6 py-4 pb-8 flex-1 font-nanum">
                       <div className="font-bold text-xl mb-2 text-blue-300">{filteredPosts[current].title}</div>
                       <div
                         className="text-gray-700 text-base"
@@ -213,7 +247,7 @@ export default function Home() {
 
             </motion.div>
           </AnimatePresence>
-          <div className="w-1/3 flex justify-around fixed bottom-5 ">
+          <div className="w-1/4 h-12 flex justify-around items-center fixed bottom-5 z-30 bg-orange-100 rounded-xl font-bold">
             <button onClick={() => 
               paginate((current - 1 + filteredPosts.length) % filteredPosts.length)}>이전</button>
             {current + 1}
@@ -221,6 +255,7 @@ export default function Home() {
           </div>
         </div>
       </div>
+      
       </div>
     </>
   );

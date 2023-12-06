@@ -38,7 +38,7 @@ export default function PostEditor() {
           setSuggestions([]);
         }
       } catch (error) {
-        console.error(error);
+        // console.error(error);
       }
     };
   
@@ -149,7 +149,7 @@ export default function PostEditor() {
         </form>
         <DragAndDropUpload onImageUpload={handleImageUpload} />
       </div>
-      <div className="flex-1 h-screen w-1/2">
+      <div className="flex-1 h-screen w-1/2 font-nanum">
         <div
           className="prose p-8 overflow-scroll h-full flex-rows justify-start"
           dangerouslySetInnerHTML={{ __html: marked.parse(markdown || '') }}

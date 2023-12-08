@@ -96,7 +96,7 @@ export default function PostEditor() {
       setValue('markdown', markdown + "\t"); // 현재 커서 위치에 탭 문자 추가
     }
 
-    if (suggestions.length > 0 && event.key >= '1' && event.key <= '9') {
+    if (suggestions.length > 0 && event.ctrlKey && event.key >= '1' && event.key <= '9') {
       console.log(suggestions)
       event.preventDefault(); // 기본 키보드 이벤트 방지
       const index = parseInt(event.key, 10) - 1;

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { marked } from 'marked';
 import DragAndDropUpload from '../components/DragAndDrop';
 import { useRouter } from 'next/router';
@@ -15,19 +15,22 @@ marked.setOptions({
   });
 
 export default function PostEditor() {
-  const { register, watch, setValue, handleSubmit } = useForm();
+  const { register, watch, setValue, handleSubmit, control } = useForm();
   const [imageVariants, setImageVariants] = useState("");
   let markdown = watch('markdown');
   const router = useRouter();
   const { id } = router.query;
   const [suggestions, setSuggestions] = useState([]);
-  const textAreaRef = useRef(null);
+  const [cursorPosition, setCursorPosition] = useState(0); 
   const { data: posts, error } = useSWR('/api/get-post', fetcher);
+
 
   useEffect(() => {
     const handleKeyUp = (event) => {
       try {
+
         const cursorPosition = event.target.selectionStart;
+        setCursorPosition(cursorPosition);
         const textBeforeCursor = markdown.substring(0, cursorPosition);
         // const lastWord = textBeforeCursor.split(" ").pop();
         const lastWord = textBeforeCursor.split(/\s+/).pop();
@@ -73,7 +76,7 @@ export default function PostEditor() {
 
       console.log()
 
-  }, []); // 'markdown'의 변경을 추적
+  }, []);
 
 
   const handleImageUpload = (variants: any) => {
@@ -92,13 +95,19 @@ export default function PostEditor() {
   };
 
   const onSubmit = async (data: any) => {
+
+    const updatedData = {
+        ...data,
+        postId: id, 
+    };
+
     try {
       const response = await fetch('/api/edit-post', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(updatedData),
       });
 
       if (!response.ok) {
@@ -122,9 +131,9 @@ export default function PostEditor() {
       setValue('markdown', markdown + "\t"); // 현재 커서 위치에 탭 문자 추가
     }
 
-    if (suggestions.length > 0 && event.key >= '1' && event.key <= '9') {
+    if (suggestions.length > 0 && event.ctrlKey && event.key >= '1' && event.key <= '9') {
       console.log(suggestions)
-      event.preventDefault(); // 기본 키보드 이벤트 방지
+      event.preventDefault();
       const index = parseInt(event.key, 10) - 1;
       if (index < suggestions.length) {
         applySuggestion(suggestions[index]);
@@ -134,16 +143,18 @@ export default function PostEditor() {
   };
   
   const applySuggestion = (suggestion) => {
-    // setContent(content + suggestion);
-    setValue('markdown', markdown.substring(0, markdown.length - 1) + suggestion);
-    
+
+    const textBeforeCursor = markdown.substring(0, cursorPosition);
+    const textAfterCursor = markdown.substring(cursorPosition);
+    setValue('markdown', textBeforeCursor + suggestion.substring(1, suggestion.length) + textAfterCursor);
+    setSuggestions([]);
   };
 
   return (
     <div className="flex overflow-hidden h-screen "> 
       <div className="flex-1 h-screen w-1/2 border-r-2">
         <form onSubmit={handleSubmit(onSubmit)} className="flex-1 h-screen overflow-hidden">
-          <button type="submit" className="w-full h-12 p-8 flex justify-center items-center">포스트 생성</button>
+          <button type="submit" className="w-full h-12 p-8 flex justify-center items-center">포스트 수정</button>
           <input 
             {...register('title')}
             placeholder='Title'
@@ -154,33 +165,42 @@ export default function PostEditor() {
             placeholder='Type'
             className="w-full h-12 p-8 overflow-scroll"
           />
-          <textarea
-            {...register('markdown')}
-            className="w-full h-[calc(94vh-144px)] p-8"
-            onKeyDown={handleKeyDown}
-            // onChange={(e) => setContent(e.target.value)}
-            // onKeyUp={handleKeyUp}
-            
-          />
-          {suggestions.length > 0 && (
-            <ul className="fixed top-0 right-0">
-              {suggestions.map((suggestion, index) => (
-                <li key={index} >
-                  {suggestion}
-                </li>
-              ))}
-            </ul>
+          <Controller
+          control={control}
+          name="markdown"
+          render={({ field }) => (
+            <textarea
+              {...field}
+              className="w-full h-[calc(94vh-144px)] p-8 z-40"
+              onKeyDown={handleKeyDown}
+            />
           )}
+        />
+            <div className="fixed top-1/3 w-full flex justify-center items-center">
+            {suggestions.length > 0 && (
+              <>
+                
+                <ul className="w-48 bg-orange-200 z-40 rounded-3xl">
+                  <li className="font-bold mt-4">Ctrl + 숫자로 자동완성</li>
+                  {suggestions.map((suggestion, index) => (
+                    <li key={index} className="m-4 font-bold">
+                      {`${index}. `}{suggestion}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+            </div>
+
           
         </form>
         <DragAndDropUpload onImageUpload={handleImageUpload} />
       </div>
-      <div className="flex-1 h-screen w-1/2">
+      <div className="flex-1 h-screen w-1/2 font-nanum">
         <div
           className="prose p-8 overflow-scroll h-full flex-rows justify-start"
           dangerouslySetInnerHTML={{ __html: marked.parse(markdown || '') }}
         />
-        {/* <div>{marked.parse(markdown || '')}</div> */}
         
       </div>
     </div>

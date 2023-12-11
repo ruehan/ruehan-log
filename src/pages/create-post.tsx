@@ -17,12 +17,14 @@ export default function PostEditor() {
   let markdown = watch('markdown');
   const router = useRouter();
   const [suggestions, setSuggestions] = useState([]);
+  const [cursorPosition, setCursorPosition] = useState(0); 
   const textAreaRef = useRef(null);
 
   useEffect(() => {
     const handleKeyUp = (event) => {
       try {
         const cursorPosition = event.target.selectionStart;
+        setCursorPosition(cursorPosition);
         const textBeforeCursor = markdown.substring(0, cursorPosition);
         // const lastWord = textBeforeCursor.split(" ").pop();
         const lastWord = textBeforeCursor.split(/\s+/).pop();
@@ -109,7 +111,10 @@ export default function PostEditor() {
   
   const applySuggestion = (suggestion) => {
     // setContent(content + suggestion);
-    setValue('markdown', markdown.substring(0, markdown.length - 1) + suggestion);
+    const textBeforeCursor = markdown.substring(0, cursorPosition);
+    const textAfterCursor = markdown.substring(cursorPosition);
+    setValue('markdown', textBeforeCursor + suggestion.substring(1, suggestion.length) + textAfterCursor);
+    setSuggestions([]);
     
   };
 

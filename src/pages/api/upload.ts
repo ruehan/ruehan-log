@@ -95,6 +95,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           }
 
           const data = await streamResponse.json();
+          console.log(data.result)
           res.status(200).send(data.result);
         }
         }catch(error){

@@ -25,6 +25,21 @@ export default function Home() {
   const [direction, setDirection] = useState(0);
   const [showType, setShowType] = useState(true);
   const contentRef = useRef(null);
+  const containerRef = useRef(null);
+
+  // 맨 위로 스크롤 이동
+  const scrollToTop = () => {
+    if (containerRef.current) {
+      containerRef.current.scrollTop = 0;
+    }
+  };
+
+  // 맨 아래로 스크롤 이동
+  const scrollToBottom = () => {
+    if (containerRef.current) {
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+    }
+  };
   
 
 
@@ -162,14 +177,14 @@ export default function Home() {
         {showType ? <MenuFoldIcon /> : <MenuUnFoldIcon />}
       </button>
       {showType && (
-        <div className="flex ml-8">
+        <div className="flex items-center ml-8 h-full">
           <motion.div 
           initial="hidden"
           animate="visible"
-          exit="exit"
+          // exit="exit"
           variants={typeVariants}
           transition={{ duration: 1 }}
-          className="flex flex-col w-40  justify-center h-3/4 overflow-scroll">      
+          className="flex flex-col w-36 justify-center h-3/4 overflow-scroll">      
           {[...types].map((type: any) => (
             <motion.div 
               key={type} 
@@ -181,7 +196,7 @@ export default function Home() {
               variants={itemVariants}
               initial="hidden"
               animate="visible"
-              exit="exit"
+              // exit="exit"
               >{type}
             </motion.div>
           ))}
@@ -189,20 +204,20 @@ export default function Home() {
         <motion.div 
         initial="hidden"
         animate="visible"
-        exit="exit"
+        // exit="exit"
         variants={typeVariants}
         transition={{ duration: 1 }}
-        className="flex flex-col w-40  justify-center h-3/4 overflow-scroll">
+        className="flex flex-col w-36 justify-center h-3/4 overflow-scroll">
         {titles.map((title: any, index: any) => (
           <motion.div
             variants={itemVariants}
             initial="hidden"
             animate="visible"
-            exit="exit"
+            // exit="exit"
             whileHover={{scale: 1.1}}
             whileTap={{scale: 0.95}}
             key={title}
-            className={`p-2 ${index === current ? 'text-blue-500 font-bold' : 'text-gray-700'}`}
+            className={`p-2 border-l-2 ${index === current ? 'text-blue-500 font-bold' : 'text-gray-700'}`}
             onClick={() => paginate(index)}
           >
             {title}
@@ -213,7 +228,20 @@ export default function Home() {
       )}
   
       <div className="flex w-full justify-center h-full overflow-hidden " >
-        <div id="container" className="relative overflow-scroll w-3/4 flex flex-col justify-between items-center bg-white shadow-lg rounded-lg m-5  text-gray-800">
+        <div id="container" ref={containerRef} className="relative overflow-scroll w-3/4 flex flex-col justify-between items-center bg-white shadow-lg rounded-lg m-5  text-gray-800">
+          
+        <div className="fixed top-5 right-10 flex flex-col w-12 h-72 justify-around items-center"> 
+                    {session && (                            
+                        <div className="flex flex-col w-16 h-32  justify-around items-center rounded-2xl border-2 border-red-200">
+                          <button id={filteredPosts[current].id} onClick={clickDelete} className=" w-12 h-12 bg-red-200 rounded-full text-white">X</button>
+                          <button id={filteredPosts[current].id} onClick={clickEdit} className=" w-12 h-12 bg-red-200 rounded-full text-white">Edit</button>
+                        </div>                            
+                )}
+                    <div className="flex flex-col w-16 h-32 justify-around items-center rounded-2xl border-2 border-blue-200">
+                          <button onClick={scrollToTop} className="bg-blue-200 text-white rounded-full w-12 h-12">Top</button>
+                          <button onClick={scrollToBottom} className="bg-blue-200 text-white rounded-full w-12 h-12">Bottom</button>
+                        </div>
+                    </div>
           <AnimatePresence initial={false}>
             <motion.div
               key={current}
@@ -230,12 +258,8 @@ export default function Home() {
               style={{position: 'absolute', width: '100%'}}>
                 {
                   <div key={filteredPosts[current].id} className="relative" >
-                    {session && (
-                      <>                      
-                        <button id={filteredPosts[current].id} onClick={clickDelete} className="absolute top-5 right-5 w-12 h-12 bg-red-100 rounded-full">X</button>
-                        <button id={filteredPosts[current].id} onClick={clickEdit} className="absolute top-20 right-5 w-12 h-12 bg-blue-100 rounded-full">Edit</button></>
-                )}
-                    <div className="px-6 py-4 pb-8 flex-1 font-nanum">
+                    
+                    <div className="px-6 py-4 pb-8 flex-1 font-nanum" >
                       <div className="font-bold text-xl mb-2 text-blue-300">{filteredPosts[current].title}</div>
                       <div
                         className="text-gray-700 text-base"

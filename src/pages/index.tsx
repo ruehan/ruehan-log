@@ -8,6 +8,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { RiMenuFoldLine as MenuFoldIcon, RiMenuUnfoldLine as MenuUnFoldIcon } from "react-icons/ri";
 import LoadingComponent from './components/Loader';
+import { stringify } from 'querystring';
 
 const fetcher = (url: any) => fetch(url).then((res) => res.json());
 
@@ -20,6 +21,8 @@ export default function Home() {
   const [direction, setDirection] = useState(0);
   const [showType, setShowType] = useState(true);
   const containerRef = useRef<null | HTMLDivElement>(null);
+  const [searchedPosts, setSearchedPosts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const scrollToTop = () => {
     if (containerRef.current) {
@@ -51,6 +54,19 @@ export default function Home() {
       element.scrollTop = 0;
     }
   }, [current]);
+
+  useEffect(() => {
+    try{
+      const results = posts.getPost.filter((post: { title: string; content: string; }) =>
+      post.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      post.content.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+
+      setSearchedPosts(results);
+    }catch{
+
+    }
+  }, [searchTerm, posts]);
 
   if(!posts){
     return <LoadingComponent />
@@ -148,12 +164,34 @@ export default function Home() {
 
   return (
     <>   
+    <div className="fixed w-72 h-1/2 bottom-0 right-0 z-40 border-2 overflow-scroll border-orange-200 hidden lg:block">
+      <input
+        type="text"
+        placeholder="검색 기능 테스트 중.."
+        value={searchTerm}
+        className="w-72 h-12 sticky top-0"
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+
+      <div className="w-64 overflow-scroll font-nanum flex-1 items-center">
+        {searchedPosts.map(post => (
+          <div key={post.id} className="p-2 border-b">
+            <h3>{post.title}</h3>
+            {/* <p>{post.content.substring(0, 100)}...</p> */}
+            <div
+              className="text-sm"
+              dangerouslySetInnerHTML={{ __html: marked.parse(post.content || '').substring(0, 300) }}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
     <div className="flex flex-col items-center md:flex-row w-full justify-center overflow-hidden" style={{height: '90vh'}} >
       <button onClick={toggleTypes} className="fixed top-5 left-5 text-4xl bg-gray-500 text-white rounded-full z-20">
         {showType ? <MenuFoldIcon /> : <MenuUnFoldIcon />}
       </button>
       {showType && (
-        <div className="flex items-center justify-center bg-white ml-8 absolute h-full top-0 left-0 z-10 scrollbar-hide w-full lg:w-1/6">
+        <div className="flex items-center justify-center bg-white ml-8 absolute h-full top-0 left-0 z-10 scrollbar-hide w-full lg:w-1/6 lg:bg-inherit">
           <motion.div 
           initial="hidden"
           animate="visible"
@@ -251,7 +289,7 @@ export default function Home() {
           </div>
         </div>
       </div>
-      
+
       </div>
     </>
   );

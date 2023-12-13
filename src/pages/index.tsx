@@ -7,16 +7,11 @@ import {motion, AnimatePresence} from 'framer-motion'
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { RiMenuFoldLine as MenuFoldIcon, RiMenuUnfoldLine as MenuUnFoldIcon } from "react-icons/ri";
-import ReactPlayer from 'react-player';
 import LoadingComponent from './components/Loader';
-
 
 const fetcher = (url: any) => fetch(url).then((res) => res.json());
 
-// const TurndownService = require('turndown');
-
 export default function Home() {
-  // const turndown = new TurndownService()
   const { data: session, status } = useSession();
   const router = useRouter();
   const { data: posts, error } = useSWR('/api/get-post', fetcher);
@@ -24,25 +19,20 @@ export default function Home() {
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(0);
   const [showType, setShowType] = useState(true);
-  const contentRef = useRef(null);
-  const containerRef = useRef(null);
+  const containerRef = useRef<null | HTMLDivElement>(null);
 
-  // 맨 위로 스크롤 이동
   const scrollToTop = () => {
     if (containerRef.current) {
       containerRef.current.scrollTop = 0;
     }
   };
 
-  // 맨 아래로 스크롤 이동
   const scrollToBottom = () => {
     if (containerRef.current) {
       containerRef.current.scrollTop = containerRef.current.scrollHeight;
     }
   };
   
-
-
   const paginate = (newIndex: any) => {
     setCurrent(newIndex);
     setDirection(newIndex > current ? 1 : 0);
@@ -52,21 +42,15 @@ export default function Home() {
   useEffect(() => {
     console.log(session)
     if (status !== 'loading' && !session) {
-      // router.push('/login')
     }
   }, [session, status, router]);
 
-  // if (status === 'loading' || !session) {
-  //   return <div>Loading...</div>;
-  // }
-
   useEffect(() => {
-    // 스크롤 위치를 상단으로 이동
     const element = document.getElementById('container');
     if (element) {
       element.scrollTop = 0;
     }
-  }, [current]); // 'current'가 변경될 때마다 실행
+  }, [current]);
 
   if(!posts){
     return <LoadingComponent />
@@ -74,7 +58,7 @@ export default function Home() {
 
   const types = new Set(posts.getPost.map((post: any) => post.type));
   const filteredPosts = posts.getPost.filter((post: any) => post.type == selectedType);
-  const titles = filteredPosts.map((post) => post.title);
+  const titles = filteredPosts.map((post: { title: any; }) => post.title);
   
   const itemVariants = {
     hidden: { scale: 0, rotate: 0 },
@@ -137,10 +121,6 @@ export default function Home() {
     }
   };
 
-
-
-
-
   const requestUpdate = async (id: any) => {
     await fetch('/api/delete-post', {
       method: 'POST',
@@ -166,37 +146,31 @@ export default function Home() {
     return <LoadingComponent />
   }
 
-  console.log(filteredPosts)
-
-  // console.log(turndown.turndown(filteredPosts[0].content))
-
   return (
     <>   
-    <div className="flex w-full justify-center " style={{height: '100vh'}}>
-      <button onClick={toggleTypes} className="fixed top-10 left-10 text-4xl bg-gray-500 text-white rounded-full">
+    <div className="flex flex-col items-center md:flex-row w-full justify-center overflow-hidden" style={{height: '90vh'}} >
+      <button onClick={toggleTypes} className="fixed top-5 left-5 text-4xl bg-gray-500 text-white rounded-full z-20">
         {showType ? <MenuFoldIcon /> : <MenuUnFoldIcon />}
       </button>
       {showType && (
-        <div className="flex items-center ml-8 h-full">
+        <div className="flex items-center justify-center bg-white ml-8 absolute h-full top-0 left-0 z-10 scrollbar-hide w-full lg:w-1/6">
           <motion.div 
           initial="hidden"
           animate="visible"
           // exit="exit"
           variants={typeVariants}
           transition={{ duration: 1 }}
-          className="flex flex-col w-36 justify-center h-3/4 overflow-scroll">      
+          className="flex flex-col">      
           {[...types].map((type: any) => (
             <motion.div 
               key={type} 
-              // className="h-24 w-20  mt-4 bg-white text-center shadow-lg border rounded-md flex items-center justify-center text-sm" 
-              className={`p-2 ${type === selectedType ? 'text-blue-500 font-bold' : 'text-gray-700'}`}
+              className={`p-2  ${type === selectedType ? 'text-blue-500 font-bold' : 'text-gray-700'}`}
               onClick={() => onClickType(type)}
               whileHover={{scale: 1.1}}
               whileTap={{scale: 0.95}}
               variants={itemVariants}
               initial="hidden"
               animate="visible"
-              // exit="exit"
               >{type}
             </motion.div>
           ))}
@@ -213,7 +187,6 @@ export default function Home() {
             variants={itemVariants}
             initial="hidden"
             animate="visible"
-            // exit="exit"
             whileHover={{scale: 1.1}}
             whileTap={{scale: 0.95}}
             key={title}
@@ -227,17 +200,17 @@ export default function Home() {
         </div>
       )}
   
-      <div className="flex w-full justify-center h-full overflow-hidden " >
-        <div id="container" ref={containerRef} className="relative overflow-scroll w-3/4 flex flex-col justify-between items-center bg-white shadow-lg rounded-lg m-5  text-gray-800">
+      <div className="flex w-full lg:w-5/6 justify-center h-full overflow-hidden " >
+        <div id="container" ref={containerRef} className="relative overflow-scroll w-3/4 flex flex-col justify-between items-center bg-white shadow-lg rounded-lg m-5 text-gray-800">
           
-        <div className="fixed top-5 right-10 flex flex-col w-12 h-72 justify-around items-center"> 
+        <div className="fixed top-5 right-1 md:right-10 flex flex-col w-12 h-72 justify-around items-center"> 
                     {session && (                            
-                        <div className="flex flex-col w-16 h-32  justify-around items-center rounded-2xl border-2 border-red-200">
+                        <div className="flex flex-col w-12 md:w-16 h-32 justify-around items-center rounded-2xl border-2 border-red-200">
                           <button id={filteredPosts[current].id} onClick={clickDelete} className=" w-12 h-12 bg-red-200 rounded-full text-white">X</button>
                           <button id={filteredPosts[current].id} onClick={clickEdit} className=" w-12 h-12 bg-red-200 rounded-full text-white">Edit</button>
                         </div>                            
                 )}
-                    <div className="flex flex-col w-16 h-32 justify-around items-center rounded-2xl border-2 border-blue-200">
+                    <div className="flex flex-col w-12 md:w-16 h-32 justify-around items-center rounded-2xl border-2 border-blue-200">
                           <button onClick={scrollToTop} className="bg-blue-200 text-white rounded-full w-12 h-12">Top</button>
                           <button onClick={scrollToBottom} className="bg-blue-200 text-white rounded-full w-12 h-12">Bottom</button>
                         </div>
@@ -251,7 +224,6 @@ export default function Home() {
               animate="center"
               exit="exit"
               transition={{
-                // x: { type: "spring", stiffness: 300, damping: 30 },
                 opacity: { duration: .25 }
               }}
               
@@ -271,7 +243,7 @@ export default function Home() {
 
             </motion.div>
           </AnimatePresence>
-          <div className="w-1/4 h-12 flex justify-around items-center fixed bottom-5 z-30 bg-orange-100 rounded-xl font-bold">
+          <div className="w-full flex justify-around items-center fixed bottom-0  md:fixed md:w-1/4 h-12 bg-orange-100 rounded-xl font-bold z-40">
             <button onClick={() => 
               paginate((current - 1 + filteredPosts.length) % filteredPosts.length)}>이전</button>
             {current + 1}

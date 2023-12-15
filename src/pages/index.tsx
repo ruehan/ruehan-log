@@ -188,6 +188,9 @@ export default function Home() {
         throw new Error('회원가입 실패');
       }
 
+      setValue('nickname', '')
+      setValue('comment', '')
+
       mutate('/api/get-comment')
     } catch (error) {
       console.error('회원가입 중 에러 발생:', error);
@@ -196,22 +199,22 @@ export default function Home() {
 
   return (
     <>   
-    <form onSubmit={handleSubmit(onSubmit)} className="fixed right-0 bottom-0 flex-1 h-screen overflow-hidden lg:w-1/6 h-1/2  ">
-          <div className="absolute bottom-0">
+    <form onSubmit={handleSubmit(onSubmit)} className="fixed right-0 bottom-0 flex-1 h-screen overflow-hidden hidden lg:block lg:w-1/6 h-1/2  ">
+          <div className="absolute bottom-4 w-full flex flex-col justify-center items-center">
             <input 
               {...register('nickname')}
-              placeholder='Nickname'
-              className="w-full h-8 p-4"
+              placeholder='닉네임 입력..'
+              className="w-full h-8 p-4 border-2 border-blue-100 rounded-xl m-2"
             />
             <input 
               {...register('comment')}
-              placeholder='Comment'
-              className="w-full h-8 p-4"
+              placeholder='댓글 입력..'
+              className="w-full h-8 p-4 border-2 border-blue-100 rounded-xl m-2"
             />
-            <button type="submit" className="w-full h-12 p-8 flex justify-center items-center">댓글 추가</button>
+            <button type="submit" className="w-1/2 h-8 p-4 mt-2 flex justify-center items-center border-2 bg-blue-300 text-white rounded-xl">댓글 등록</button>
           </div>
           {comments.getComment.map((comment: any) => (
-            <div key={comment.id} className="flex flex-col font-nanum p-2 m-2 border-2 border-blue-100">
+            <div key={comment.id} className="flex flex-col font-nanum p-2 m-2 border-2 border-blue-100 rounded-xl">
               <div className="flex justify-between">
                 <div className="text-lg">{comment.author}</div>
                 <div>[{unix_timestamp(comment.createdAt)}]</div>
@@ -222,11 +225,11 @@ export default function Home() {
     </form>
 
     <div className="flex flex-col items-center md:flex-row w-full justify-center overflow-hidden" style={{height: '90vh'}} >
-      <button onClick={toggleTypes} className="fixed top-5 left-5 text-4xl bg-gray-500 text-white rounded-full z-20">
+      <button onClick={toggleTypes} className="fixed top-5 left-5 text-4xl bg-gray-500 text-white rounded-full z-50">
         {showType ? <MenuFoldIcon /> : <MenuUnFoldIcon />}
       </button>
       {showType && (
-        <div className="flex items-center justify-center bg-white ml-8 absolute h-full top-0 left-0 z-10 scrollbar-hide w-full lg:w-1/6 lg:bg-inherit">
+        <div className="flex items-center justify-center bg-white ml-8 absolute h-full top-0 left-0 z-40 scrollbar-hide w-full lg:w-1/6 lg:bg-inherit">
           <motion.div 
           initial="hidden"
           animate="visible"
@@ -274,9 +277,7 @@ export default function Home() {
       )}
   
       <div className="flex w-full lg:w-5/6 justify-center h-full overflow-hidden " >
-        <div id="container" ref={containerRef} className="relative overflow-scroll w-3/4 flex flex-col justify-between items-center bg-white shadow-lg rounded-lg m-5 text-gray-800">
-          
-        <div className="fixed top-5 right-1 md:right-10 flex flex-col w-12 h-72 justify-around items-center"> 
+      <div className="fixed top-5 right-0 lg:sticky lg:right-0 flex flex-col w-12 h-72 justify-around items-center z-20 text-sm"> 
                     {session && (                            
                         <div className="flex flex-col w-12 md:w-16 h-32 justify-around items-center rounded-2xl border-2 border-red-200">
                           <button id={filteredPosts[current].id} onClick={clickDelete} className=" w-12 h-12 bg-red-200 rounded-full text-white">X</button>
@@ -287,7 +288,9 @@ export default function Home() {
                           <button onClick={scrollToTop} className="bg-blue-200 text-white rounded-full w-12 h-12">Top</button>
                           <button onClick={scrollToBottom} className="bg-blue-200 text-white rounded-full w-12 h-12">Bottom</button>
                         </div>
-                    </div>
+          </div>
+        <div id="container" ref={containerRef} className="relative overflow-scroll w-3/4 flex flex-col justify-between items-center bg-white shadow-lg rounded-lg m-5 text-gray-800">
+          
           <AnimatePresence initial={false}>
             <motion.div
               key={current}
@@ -315,7 +318,7 @@ export default function Home() {
                 }
             </motion.div>
           </AnimatePresence>
-          <div className="w-full flex justify-around items-center fixed bottom-0  md:fixed md:w-1/4 h-12 bg-orange-100 rounded-xl font-bold z-40">
+          <div className="w-full flex justify-around items-center fixed bottom-0  md:fixed md:w-1/4 h-12 bg-orange-100 rounded-xl font-bold z-30">
             <button onClick={() => 
               paginate((current - 1 + filteredPosts.length) % filteredPosts.length)}>이전</button>
             {current + 1}

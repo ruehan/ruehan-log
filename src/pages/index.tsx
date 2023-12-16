@@ -214,13 +214,15 @@ export default function Home() {
             <button type="submit" className="w-1/2 h-8 p-4 mt-2 flex justify-center items-center border-2 bg-blue-300 text-white rounded-xl">댓글 등록</button>
           </div>
           {comments.getComment.map((comment: any) => (
-            <div key={comment.id} className="flex flex-col font-nanum p-2 m-2 border-2 border-blue-100 rounded-xl">
+            comment.postId == filteredPosts[current].id ? (
+              <div key={comment.id} className="flex flex-col font-nanum p-2 m-2 border-2 border-blue-100 rounded-xl">
               <div className="flex justify-between">
-                <div className="text-lg">{comment.author}</div>
+                <div className="text-lg">{comment.author == "ruehan" ? `👨‍💻 ${comment.author}` : comment.author}</div>
                 <div>[{unix_timestamp(comment.createdAt)}]</div>
               </div>
               <div className="text-2xl">{comment.content}</div>
             </div>
+            ) : null
           ))}
     </form>
 

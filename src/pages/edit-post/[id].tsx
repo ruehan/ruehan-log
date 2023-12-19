@@ -3,15 +3,10 @@ import { Controller, useForm } from 'react-hook-form';
 import { marked } from 'marked';
 import DragAndDropUpload from '../components/DragAndDrop';
 import { useRouter } from 'next/router';
-import useSWR from 'swr';
-
-
-const fetcher = (url: any) => fetch(url).then((res) => res.json());
 
 marked.setOptions({
     gfm: true,
     breaks: true,
-    // 기타 필요한 옵션
   });
 
 export default function PostEditor() {
@@ -20,13 +15,13 @@ export default function PostEditor() {
   let markdown = watch('markdown');
   const router = useRouter();
   const { id } = router.query;
-  const [suggestions, setSuggestions] = useState([]);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   const [cursorPosition, setCursorPosition] = useState(0); 
-  const { data: posts, error } = useSWR('/api/get-post', fetcher);
+
 
 
   useEffect(() => {
-    const handleKeyUp = (event) => {
+    const handleKeyUp = (event: any) => {
       try {
 
         const cursorPosition = event.target.selectionStart;
@@ -35,9 +30,6 @@ export default function PostEditor() {
         // const lastWord = textBeforeCursor.split(" ").pop();
         const lastWord = textBeforeCursor.split(/\s+/).pop();
 
-        console.log(cursorPosition + ' | ' + lastWord + ' | ' + lastWord.startsWith("*"))
-        
-  
         if (lastWord.startsWith("*")) {
           setSuggestions(["**", "****"]);
         } else if (lastWord.startsWith(">")) {
@@ -46,13 +38,12 @@ export default function PostEditor() {
           setSuggestions([]);
         }
       } catch (error) {
-        // console.error(error);
       }
     };
   
     document.addEventListener('keyup', handleKeyUp);
     return () => document.removeEventListener('keyup', handleKeyUp);
-  }, [markdown]); // 'markdown'의 변경을 추적
+  }, [markdown]);
 
   useEffect(() => {
     const requestUpdate = async (id: any) => {
@@ -71,13 +62,11 @@ export default function PostEditor() {
         setValue('type', result.getPost[0].type);
         setValue('title', result.getPost[0].title);
       }
-
       requestUpdate(id) 
 
       console.log()
 
   }, []);
-
 
   const handleImageUpload = (variants: any) => {
     setImageVariants(variants);
@@ -89,9 +78,7 @@ export default function PostEditor() {
       const imageMarkdown = `![image](${variants})\n`;
       setValue('markdown', markdown + imageMarkdown);
     }
-
     console.log(`데이터 받기 성공..! | ${variants}`)
-  
   };
 
   const onSubmit = async (data: any) => {
@@ -123,12 +110,10 @@ export default function PostEditor() {
 
   const handleKeyDown = (event: any) => {
     if (event.key === 'Enter') {
-      // 엔터 키 처리 로직
-      // setValue('markdown', markdown + " <br>");
+
     } else if (event.key === 'Tab') {
-      // 탭 키 처리 로직
-      event.preventDefault(); // 기본 탭 키 동작 방지
-      setValue('markdown', markdown + "\t"); // 현재 커서 위치에 탭 문자 추가
+      event.preventDefault();
+      setValue('markdown', markdown + "\t"); 
     }
 
     if (suggestions.length > 0 && event.ctrlKey && event.key >= '1' && event.key <= '9') {
@@ -142,7 +127,7 @@ export default function PostEditor() {
     }
   };
   
-  const applySuggestion = (suggestion) => {
+  const applySuggestion = (suggestion: any) => {
 
     const textBeforeCursor = markdown.substring(0, cursorPosition);
     const textAfterCursor = markdown.substring(cursorPosition);
@@ -184,7 +169,7 @@ export default function PostEditor() {
                   <li className="font-bold mt-4">Ctrl + 숫자로 자동완성</li>
                   {suggestions.map((suggestion, index) => (
                     <li key={index} className="m-4 font-bold">
-                      {`${index}. `}{suggestion}
+                      {`${index + 1}. `}{suggestion}
                     </li>
                   ))}
                 </ul>
@@ -192,7 +177,6 @@ export default function PostEditor() {
             )}
             </div>
 
-          
         </form>
         <DragAndDropUpload onImageUpload={handleImageUpload} />
       </div>

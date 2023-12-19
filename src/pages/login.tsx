@@ -5,20 +5,20 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: any) => {
     event.preventDefault();
 
-    const result = await signIn('credentials', {
+    const result: any = await signIn('credentials', {
       redirect: false,
       email: email,
       password: password
     });
 
     if (!result.error) {
-      // 로그인 성공 처리
+
       window.location.href = '/';
     } else {
-      // 로그인 실패 처리
+
       console.error(result.error);
     }
   };

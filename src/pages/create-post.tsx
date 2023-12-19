@@ -4,11 +4,9 @@ import { marked } from 'marked';
 import DragAndDropUpload from './components/DragAndDrop';
 import { useRouter } from 'next/router';
 
-
 marked.setOptions({
     gfm: true,
     breaks: true,
-    // 기타 필요한 옵션
   });
 
 export default function PostEditor() {
@@ -16,21 +14,16 @@ export default function PostEditor() {
   const [imageVariants, setImageVariants] = useState("");
   let markdown = watch('markdown');
   const router = useRouter();
-  const [suggestions, setSuggestions] = useState([]);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   const [cursorPosition, setCursorPosition] = useState(0); 
-  const textAreaRef = useRef(null);
 
   useEffect(() => {
-    const handleKeyUp = (event) => {
+    const handleKeyUp = (event: any) => {
       try {
         const cursorPosition = event.target.selectionStart;
         setCursorPosition(cursorPosition);
         const textBeforeCursor = markdown.substring(0, cursorPosition);
-        // const lastWord = textBeforeCursor.split(" ").pop();
         const lastWord = textBeforeCursor.split(/\s+/).pop();
-
-        console.log(cursorPosition + ' | ' + lastWord + ' | ' + lastWord.startsWith("*"))
-        
   
         if (lastWord.startsWith("*")) {
           setSuggestions(["**", "****"]);
@@ -40,13 +33,12 @@ export default function PostEditor() {
           setSuggestions([]);
         }
       } catch (error) {
-        // console.error(error);
       }
     };
   
     document.addEventListener('keyup', handleKeyUp);
     return () => document.removeEventListener('keyup', handleKeyUp);
-  }, [markdown]); // 'markdown'의 변경을 추적
+  }, [markdown]);
 
 
   const handleImageUpload = (variants: any) => {
@@ -75,32 +67,28 @@ export default function PostEditor() {
       });
 
       if (!response.ok) {
-        throw new Error('회원가입 실패');
+        throw new Error('포스트 생성 실패');
       }
 
-      // 회원가입 성공 처리
       const result = await response.json();
-      console.log(result); // 또는 사용자에게 성공 메시지 표시
+      console.log(result); 
       router.push('/')
     } catch (error) {
-      console.error('회원가입 중 에러 발생:', error);
-      // 사용자에게 에러 메시지 표시
+      console.error('포스트 생성 중 에러 발생:', error);
     }
   };
 
   const handleKeyDown = (event: any) => {
     if (event.key === 'Enter') {
-      // 엔터 키 처리 로직
-      // setValue('markdown', markdown + " <br>");
+      // Nothing here now..
     } else if (event.key === 'Tab') {
-      // 탭 키 처리 로직
-      event.preventDefault(); // 기본 탭 키 동작 방지
-      setValue('markdown', markdown + "\t"); // 현재 커서 위치에 탭 문자 추가
+      event.preventDefault();
+      setValue('markdown', markdown + "\t");
     }
 
     if (suggestions.length > 0 && event.ctrlKey && event.key >= '1' && event.key <= '9') {
       console.log(suggestions)
-      event.preventDefault(); // 기본 키보드 이벤트 방지
+      event.preventDefault();
       const index = parseInt(event.key, 10) - 1;
       if (index < suggestions.length) {
         applySuggestion(suggestions[index]);
@@ -109,8 +97,7 @@ export default function PostEditor() {
     }
   };
   
-  const applySuggestion = (suggestion) => {
-    // setContent(content + suggestion);
+  const applySuggestion = (suggestion: any) => {
     const textBeforeCursor = markdown.substring(0, cursorPosition);
     const textAfterCursor = markdown.substring(cursorPosition);
     setValue('markdown', textBeforeCursor + suggestion.substring(1, suggestion.length) + textAfterCursor);
@@ -136,20 +123,23 @@ export default function PostEditor() {
           <textarea
             {...register('markdown')}
             className="w-full h-[calc(94vh-144px)] p-8"
-            onKeyDown={handleKeyDown}
-            // onChange={(e) => setContent(e.target.value)}
-            // onKeyUp={handleKeyUp}
-            
+            onKeyDown={handleKeyDown}           
           />
-          {suggestions.length > 0 && (
-            <ul className="fixed top-0 right-0">
-              {suggestions.map((suggestion, index) => (
-                <li key={index} >
-                  {suggestion}
-                </li>
-              ))}
-            </ul>
-          )}
+          <div className="fixed top-1/3 w-full flex justify-center items-center">
+            {suggestions.length > 0 && (
+              <>
+                
+                <ul className="w-48 bg-orange-200 z-40 rounded-3xl">
+                  <li className="font-bold mt-4">Ctrl + 숫자로 자동완성</li>
+                  {suggestions.map((suggestion, index) => (
+                    <li key={index} className="m-4 font-bold">
+                      {`${index + 1}. `}{suggestion}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+            </div>
           
         </form>
         <DragAndDropUpload onImageUpload={handleImageUpload} />
@@ -158,9 +148,7 @@ export default function PostEditor() {
         <div
           className="prose p-8 overflow-scroll h-full flex-rows justify-start"
           dangerouslySetInnerHTML={{ __html: marked.parse(markdown || '') }}
-        />
-        {/* <div>{marked.parse(markdown || '')}</div> */}
-        
+        />        
       </div>
     </div>
   );

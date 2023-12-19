@@ -18,12 +18,11 @@ export default function Register() {
         throw new Error('회원가입 실패');
       }
 
-      // 회원가입 성공 처리
       const result = await response.json();
-      console.log(result); // 또는 사용자에게 성공 메시지 표시
+      console.log(result); 
     } catch (error) {
       console.error('회원가입 중 에러 발생:', error);
-      // 사용자에게 에러 메시지 표시
+
     }
   };
 
@@ -37,7 +36,7 @@ export default function Register() {
             {...register("email", { required: "이메일은 필수 항목입니다." })}
             type="email"
           />
-          {errors.email && <p>{errors.email.message}</p>}
+          {errors.email && <p>{errors.email.message?.toString()}</p>}
         </div>
         <div>
           <label htmlFor="password">비밀번호</label>
@@ -45,7 +44,7 @@ export default function Register() {
             {...register("password", { required: "비밀번호는 필수 항목입니다." })}
             type="password"
           />
-          {errors.password && <p>{errors.password.message}</p>}
+          {errors.password && <p>{errors.email.password?.toString()}</p>}
         </div>
         <div>
           <label htmlFor="name">이름</label>

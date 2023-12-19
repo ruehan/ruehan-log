@@ -4,14 +4,11 @@ import { useRouter } from 'next/router';
 import useSWR, { mutate } from 'swr';
 import { marked } from 'marked';
 import {motion, AnimatePresence} from 'framer-motion'
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
 import { RiMenuFoldLine as MenuFoldIcon, RiMenuUnfoldLine as MenuUnFoldIcon } from "react-icons/ri";
 import LoadingComponent from './components/Loader';
 import { useForm } from 'react-hook-form';
-import moment from "moment";
-
-const fetcher = (url: any) => fetch(url).then((res) => res.json());
+import { itemVariants, typeVariants, variants } from '@/utils/motion';
+import { fetcher, unix_timestamp } from '@/utils/utils';
 
 export default function Home() {
   const { data: session, status } = useSession();
@@ -23,15 +20,11 @@ export default function Home() {
   const [direction, setDirection] = useState(0);
   const [showType, setShowType] = useState(true);
   const containerRef = useRef<null | HTMLDivElement>(null);
-  const [searchedPosts, setSearchedPosts] = useState([]);
+  // const [searchedPosts, setSearchedPosts] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const { register, watch, setValue, handleSubmit, control } = useForm();
 
   let nickname = watch('nickname');
-
-  function unix_timestamp(t: moment.MomentInput){  
-    return moment(t).format('YYYY-MM-DD HH:mm:ss')
-  }
 
   const scrollToTop = () => {
     if (containerRef.current) {
@@ -48,7 +41,6 @@ export default function Home() {
   const paginate = (newIndex: any) => {
     setCurrent(newIndex);
     setDirection(newIndex > current ? 1 : 0);
-
   }
 
   useEffect(() => {
@@ -64,18 +56,18 @@ export default function Home() {
     }
   }, [current]);
 
-  useEffect(() => {
-    try{
-      const results = posts.getPost.filter((post: { title: string; content: string; }) =>
-      post.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-      post.content.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+  // useEffect(() => {
+  //   try{
+  //     const results = posts.getPost.filter((post: { title: string; content: string; }) =>
+  //     post.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+  //     post.content.toLowerCase().includes(searchTerm.toLowerCase())
+  //     );
 
-      setSearchedPosts(results);
-    }catch{
+  //     setSearchedPosts(results);
+  //   }catch{
 
-    }
-  }, [searchTerm, posts]);
+  //   }
+  // }, [searchTerm, posts]);
 
   if(!posts){
     return <LoadingComponent />
@@ -89,36 +81,6 @@ export default function Home() {
   const filteredPosts = posts.getPost.filter((post: any) => post.type == selectedType);
   const titles = filteredPosts.map((post: { title: any; }) => post.title);
   
-  const itemVariants = {
-    hidden: { scale: 0, rotate: 0 },
-    visible: {
-      scale: 1,
-      rotate: 360,
-      transition: {
-        type: "tween",
-        stiffness: 260,
-        damping: 20,
-        duration: .75
-      }
-    },
-    exit: {
-      scale: 0,
-      rotate: -360,
-      transition: {
-        type: "tween",
-        stiffness: 260,
-        damping: 20,
-        duration: .75
-      }
-    }
-  };
-
-  const typeVariants = {
-    hidden: { opacity: 0, x: -300 },
-    visible: { opacity: 1, x: 0 },
-    exit: { opacity: 0, x: -300, rotate: 180 },
-  };
-
   const onClickType = (type: any) => {
     setSelectedType(type)
     setCurrent(0)
@@ -127,29 +89,7 @@ export default function Home() {
   const toggleTypes = () => {
     setShowType(!showType);
   };
-
-  const variants = {
-    enter: (direction: any) => {
-      return {
-        x: direction === 0 ? -1000 : 1000,
-        opacity: 0,
-        zIndex: 0,
-      };
-    },
-    center: {
-      zIndex: 1,
-      x: 0,
-      opacity: 1
-    },
-    exit: (direction: any) => {
-      return {
-        zIndex: 0,
-        x: direction === 0 ? 1000 : -1000,
-        opacity: 0
-      };
-    }
-  };
-
+  
   const requestUpdate = async (id: any) => {
     await fetch('/api/delete-post', {
       method: 'POST',
@@ -224,7 +164,7 @@ export default function Home() {
   };
 
   return (
-    <>  
+    <>
     <form onSubmit={handleSubmit(onSubmit)} className="fixed right-0 bottom-0 flex-1 h-screen overflow-hidden hidden lg:block lg:w-1/6 h-1/2  ">
           <div className="absolute bottom-4 w-full flex flex-col justify-center items-center">
             <input 
@@ -259,6 +199,11 @@ export default function Home() {
       <button onClick={toggleTypes} className="fixed top-5 left-5 text-4xl bg-gray-500 text-white rounded-full z-50">
         {showType ? <MenuFoldIcon /> : <MenuUnFoldIcon />}
       </button>
+
+      <button onClick={() => router.push('/create-post')} className="fixed top-5 left-20 w-32 text-4xl bg-gray-500 text-white rounded-full z-50 font-nanum text-md">
+        포스트 생성
+      </button>
+
       {showType && (
         <div className="flex items-center justify-center bg-white ml-8 absolute h-full top-0 left-0 z-40 scrollbar-hide w-full lg:w-1/6 lg:bg-inherit">
           <motion.div

@@ -27,6 +27,8 @@ export default function Home() {
   const [searchTerm, setSearchTerm] = useState('');
   const { register, watch, setValue, handleSubmit, control } = useForm();
 
+  let nickname = watch('nickname');
+
   function unix_timestamp(t: moment.MomentInput){  
     return moment(t).format('YYYY-MM-DD HH:mm:ss')
   }
@@ -76,6 +78,10 @@ export default function Home() {
   }, [searchTerm, posts]);
 
   if(!posts){
+    return <LoadingComponent />
+  }
+
+  if(!comments){
     return <LoadingComponent />
   }
 
@@ -154,6 +160,22 @@ export default function Home() {
     });
   }
 
+  const requestUpdateComment = async (id: any) => {
+    await fetch('/api/delete-comment', {
+      method: 'POST',
+      body: JSON.stringify({ commentId : id}),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  }
+
+  const clickDelComment = async (e: any) => {
+    await requestUpdateComment(e.target.id)
+
+    mutate('/api/get-comment') 
+  }
+
   const clickDelete = async (e: any) => {
     await requestUpdate(e.target.id) 
 
@@ -176,16 +198,20 @@ export default function Home() {
         postId: filteredPosts[current].id
       }
 
-      const response = await fetch('/api/create-comment', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newData),
-      });
-
-      if (!response.ok) {
-        throw new Error('회원가입 실패');
+      if(nickname == "ruehan" && session){
+        const response = await fetch('/api/create-comment', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(newData),
+        });
+  
+        if (!response.ok) {
+          throw new Error('회원가입 실패');
+        }
+      }else{
+        alert("관리자만 사용 가능합니다..!")
       }
 
       setValue('nickname', '')
@@ -198,7 +224,7 @@ export default function Home() {
   };
 
   return (
-    <>   
+    <>  
     <form onSubmit={handleSubmit(onSubmit)} className="fixed right-0 bottom-0 flex-1 h-screen overflow-hidden hidden lg:block lg:w-1/6 h-1/2  ">
           <div className="absolute bottom-4 w-full flex flex-col justify-center items-center">
             <input 
@@ -216,6 +242,9 @@ export default function Home() {
           {comments.getComment.map((comment: any) => (
             comment.postId == filteredPosts[current].id ? (
               <div key={comment.id} className="flex flex-col font-nanum p-2 m-2 border-2 border-blue-100 rounded-xl">
+              {session && (
+                <div id={comment.id} className="text-red-600 w-4 h-4" onClick={clickDelComment}>X</div>
+              )}
               <div className="flex justify-between">
                 <div className="text-lg">{comment.author == "ruehan" ? `👨‍💻 ${comment.author}` : comment.author}</div>
                 <div>[{unix_timestamp(comment.createdAt)}]</div>
@@ -232,17 +261,16 @@ export default function Home() {
       </button>
       {showType && (
         <div className="flex items-center justify-center bg-white ml-8 absolute h-full top-0 left-0 z-40 scrollbar-hide w-full lg:w-1/6 lg:bg-inherit">
-          <motion.div 
+          <motion.div
           initial="hidden"
           animate="visible"
-          // exit="exit"
           variants={typeVariants}
           transition={{ duration: 1 }}
           className="flex flex-col">      
           {[...types].map((type: any) => (
             <motion.div 
               key={type} 
-              className={`p-2  ${type === selectedType ? 'text-blue-500 font-bold' : 'text-gray-700'}`}
+              className={`p-2 ${type === selectedType ? 'text-blue-500 font-bold' : 'text-gray-700'}`}
               onClick={() => onClickType(type)}
               whileHover={{scale: 1.1}}
               whileTap={{scale: 0.95}}
@@ -256,7 +284,6 @@ export default function Home() {
         <motion.div 
         initial="hidden"
         animate="visible"
-        // exit="exit"
         variants={typeVariants}
         transition={{ duration: 1 }}
         className="flex flex-col w-36 justify-center h-3/4 overflow-scroll">
@@ -279,7 +306,7 @@ export default function Home() {
       )}
   
       <div className="flex w-full lg:w-5/6 justify-center h-full overflow-hidden " >
-      <div className="fixed top-5 right-0 lg:sticky lg:right-0 flex flex-col w-12 h-72 justify-around items-center z-20 text-sm"> 
+      <div className="fixed top-5 right-0 lg:sticky lg:right-0 flex flex-col w-12 h-72 justify-around items-center z-40 text-sm"> 
                     {session && (                            
                         <div className="flex flex-col w-12 md:w-16 h-32 justify-around items-center rounded-2xl border-2 border-red-200">
                           <button id={filteredPosts[current].id} onClick={clickDelete} className=" w-12 h-12 bg-red-200 rounded-full text-white">X</button>
@@ -308,7 +335,6 @@ export default function Home() {
               style={{position: 'absolute', width: '100%'}}>
                 {
                   <div key={filteredPosts[current].id} className="relative" >
-                    
                     <div className="px-6 py-4 pb-8 flex-1 font-nanum" >
                       <div className="font-bold text-xl mb-2 text-blue-300">{filteredPosts[current].title}</div>
                       <div

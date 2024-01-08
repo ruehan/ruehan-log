@@ -254,6 +254,10 @@ export default function Home() {
                 {
                   <div key={filteredPosts[current].id} className="relative" >
                     <div className="px-6 py-4 pb-8 flex-1 font-nanum" >
+                      <div>
+                        <div>게시 일자 : {unix_timestamp(filteredPosts[current].createdAt)}</div>
+                        <div>마지막 업데이트 : {unix_timestamp(filteredPosts[current].updatedAt)}</div>
+                      </div>
                       <div className="font-bold text-xl mb-2 text-blue-300">{filteredPosts[current].title}</div>
                       <div
                         className="text-gray-700 text-base"

@@ -16,6 +16,8 @@ export default function PostEditor() {
   const router = useRouter();
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [cursorPosition, setCursorPosition] = useState(0); 
+  const [isHandleKeyDown, setIsHandleKeyDown] = useState(true); 
+  const [isPopUp, setIsPopUp] = useState(true)
 
   useEffect(() => {
     const handleKeyUp = (event: any) => {
@@ -27,8 +29,16 @@ export default function PostEditor() {
   
         if (lastWord.startsWith("*")) {
           setSuggestions(["**", "****"]);
+          if(isHandleKeyDown === false){
+            setIsPopUp(true)
+            setIsHandleKeyDown(false)
+          }        
         } else if (lastWord.startsWith(">")) {
           setSuggestions([">****", ">**``````**"]);
+          if(isHandleKeyDown === false){
+            setIsPopUp(true)
+            setIsHandleKeyDown(false)
+          }
         } else {
           setSuggestions([]);
         }
@@ -100,6 +110,8 @@ export default function PostEditor() {
   const applySuggestion = (suggestion: any) => {
     const textBeforeCursor = markdown.substring(0, cursorPosition);
     const textAfterCursor = markdown.substring(cursorPosition);
+    setIsHandleKeyDown(true)
+    setIsPopUp(false)
     setValue('markdown', textBeforeCursor + suggestion.substring(1, suggestion.length) + textAfterCursor);
     setSuggestions([]);
     
@@ -107,6 +119,8 @@ export default function PostEditor() {
 
   return (
     <div className="flex overflow-hidden h-screen "> 
+      <button onClick={() => router.push('/')} className="w-16 h-8 bg-red-100 fixed top-4 left-4 rounded-xl">메인으로</button>
+
       <div className="flex-1 h-screen w-1/2 border-r-2">
         <form onSubmit={handleSubmit(onSubmit)} className="flex-1 h-screen overflow-hidden">
           <button type="submit" className="w-full h-12 p-8 flex justify-center items-center">포스트 생성</button>
@@ -126,9 +140,8 @@ export default function PostEditor() {
             onKeyDown={handleKeyDown}           
           />
           <div className="fixed top-1/3 w-full flex justify-center items-center">
-            {suggestions.length > 0 && (
-              <>
-                
+            {suggestions.length > 0 && isPopUp === true ?(
+              <>       
                 <ul className="w-48 bg-orange-200 z-40 rounded-3xl">
                   <li className="font-bold mt-4">Ctrl + 숫자로 자동완성</li>
                   {suggestions.map((suggestion, index) => (
@@ -138,7 +151,7 @@ export default function PostEditor() {
                   ))}
                 </ul>
               </>
-            )}
+            ): null}
             </div>
           
         </form>

@@ -15,12 +15,11 @@ export default function Home() {
   const router = useRouter();
   const { data: posts, error } = useSWR('/api/get-post', fetcher);
   const { data: comments, error: cError } = useSWR('/api/get-comment', fetcher);
-  const [selectedType, setSelectedType] = useState('한달간의 여행 기록');
+  const [selectedType, setSelectedType] = useState('잔디 심기');
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(0);
   const [showType, setShowType] = useState(true);
   const containerRef = useRef<null | HTMLDivElement>(null);
-  const [searchTerm, setSearchTerm] = useState('');
   const { register, watch, setValue, handleSubmit, control } = useForm();
   let nickname = watch('nickname');
 
@@ -38,8 +37,28 @@ export default function Home() {
   
   const paginate = (newIndex: any) => {
     setCurrent(newIndex);
+    localStorage.setItem('currentPostId', newIndex);
     setDirection(newIndex > current ? 1 : 0);
   }
+
+  useEffect(() => {
+    const {type, postId} = router.query;
+
+    if(type && postId){
+      localStorage.setItem('selectedType', type);
+      localStorage.setItem('currentPostId', postId)
+      setSelectedType(type);
+      setCurrent(Number(postId));
+    }else{
+      const savedType = localStorage.getItem('selectedType');
+      const savedPostId = localStorage.getItem('currentPostId')
+      if (savedType && savedPostId){
+        setSelectedType(savedType);
+        setCurrent(Number(savedPostId));
+      }
+    }
+
+  }, [router.query])
 
   useEffect(() => {
     console.log(session)
@@ -66,6 +85,7 @@ export default function Home() {
   const onClickType = (type: any) => {
     setSelectedType(type)
     setCurrent(0)
+    localStorage.setItem('selectedType', type);
   }
   const toggleTypes = () => {
     setShowType(!showType);
@@ -118,7 +138,7 @@ export default function Home() {
           body: JSON.stringify(newData),
         });
         if (!response.ok) {
-          throw new Error('회원가입 실패');
+          throw new Error('댓글 추가 실패');
         }
       }else if(nickname == "ruehan" && !session){
         alert("관리자만 사용 가능합니다..!")
@@ -131,14 +151,14 @@ export default function Home() {
           body: JSON.stringify(newData),
         });
         if (!response.ok) {
-          throw new Error('회원가입 실패');
+          throw new Error('댓글 추가 실패');
         }
       }
       setValue('nickname', '')
       setValue('comment', '')
       mutate('/api/get-comment')
     } catch (error) {
-      console.error('회원가입 중 에러 발생:', error);
+      console.error('댓글 추가 중 오류 발생:', error);
     }
   };
 
@@ -228,7 +248,7 @@ export default function Home() {
       <div className="flex w-full lg:w-5/6 justify-center h-full overflow-hidden " >
       <div className="fixed top-5 right-0 lg:sticky lg:right-0 flex flex-col w-12 h-72 justify-around items-center z-40 text-sm"> 
                     {session && (                            
-                        <div className="flex flex-col w-12 md:w-16 h-32 justify-around items-center rounded-2xl border-2 border-red-200">
+                        <div className="flex flex-col w-12 md:w-16 h-32 justify-around items-center rounded-2xl border-2 border-red-200 ">
                           <button id={filteredPosts[current].id} onClick={clickDelete} className=" w-12 h-12 bg-red-200 rounded-full text-white">X</button>
                           <button id={filteredPosts[current].id} onClick={clickEdit} className=" w-12 h-12 bg-red-200 rounded-full text-white">Edit</button>
                         </div>                            
@@ -254,7 +274,7 @@ export default function Home() {
                 {
                   <div key={filteredPosts[current].id} className="relative" >
                     <div className="px-6 py-4 pb-8 flex-1 font-nanum" >
-                      <div>
+                      <div className="mb-4">
                         <div>게시 일자 : {unix_timestamp(filteredPosts[current].createdAt)}</div>
                         <div>마지막 업데이트 : {unix_timestamp(filteredPosts[current].updatedAt)}</div>
                       </div>

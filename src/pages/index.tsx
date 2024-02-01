@@ -9,6 +9,7 @@ import LoadingComponent from './components/Loader';
 import { useForm } from 'react-hook-form';
 import { itemVariants, typeVariants, variants } from '@/utils/motion';
 import { fetcher, unix_timestamp } from '@/utils/utils';
+import CustomAlertModal from './components/CustomAlertModal';
 
 export default function Home() {
   const { data: session, status } = useSession();
@@ -19,9 +20,14 @@ export default function Home() {
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(0);
   const [showType, setShowType] = useState(true);
+  const [isModalOpen, setModalOpen] = useState(false);
   const containerRef = useRef<null | HTMLDivElement>(null);
   const { register, watch, setValue, handleSubmit, control } = useForm();
   let nickname = watch('nickname');
+
+  const handleSharePost = () => {
+    setModalOpen(true)
+  }
 
   const scrollToTop = () => {
     if (containerRef.current) {
@@ -49,6 +55,8 @@ export default function Home() {
       localStorage.setItem('currentPostId', postId)
       setSelectedType(type);
       setCurrent(Number(postId));
+
+      router.replace(router.pathname, undefined, {shallow: true});
     }else{
       const savedType = localStorage.getItem('selectedType');
       const savedPostId = localStorage.getItem('currentPostId')
@@ -86,6 +94,7 @@ export default function Home() {
     setSelectedType(type)
     setCurrent(0)
     localStorage.setItem('selectedType', type);
+    localStorage.setItem('currentPostId', '0');
   }
   const toggleTypes = () => {
     setShowType(!showType);
@@ -194,6 +203,7 @@ export default function Home() {
           ))}
     </form>
     <div className="flex flex-col items-center md:flex-row w-full justify-center overflow-hidden" style={{height: '90vh'}} >
+      <CustomAlertModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} message={`https://ruehan.com/?type=${selectedType.replaceAll(" ", "%20")}&postId=${current}`} />
       <button onClick={toggleTypes} className="fixed top-5 left-5 text-4xl bg-gray-500 text-white rounded-full z-50">
         {showType ? <MenuFoldIcon /> : <MenuUnFoldIcon />}
       </button>
@@ -253,7 +263,8 @@ export default function Home() {
                           <button id={filteredPosts[current].id} onClick={clickEdit} className=" w-12 h-12 bg-red-200 rounded-full text-white">Edit</button>
                         </div>                            
                 )}
-                    <div className="flex flex-col w-12 md:w-16 h-32 justify-around items-center rounded-2xl border-2 border-blue-200">
+                    <div className="flex flex-col w-12 md:w-16 h-48 justify-around items-center rounded-2xl border-2 border-blue-200">
+                          <button onClick={handleSharePost} className="bg-blue-200 text-white rounded-full w-12 h-12">Share</button>
                           <button onClick={scrollToTop} className="bg-blue-200 text-white rounded-full w-12 h-12">Top</button>
                           <button onClick={scrollToBottom} className="bg-blue-200 text-white rounded-full w-12 h-12">Bottom</button>
                         </div>

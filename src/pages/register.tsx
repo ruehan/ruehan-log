@@ -28,29 +28,32 @@ export default function Register() {
 
   return (
     <div>
-      <h1>회원가입</h1>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div>
-          <label htmlFor="email">이메일</label>
-          <input
-            {...register("email", { required: "이메일은 필수 항목입니다." })}
-            type="email"
-          />
-          {errors.email && <p>{errors.email.message?.toString()}</p>}
-        </div>
-        <div>
-          <label htmlFor="password">비밀번호</label>
-          <input
-            {...register("password", { required: "비밀번호는 필수 항목입니다." })}
-            type="password"
-          />
-          {errors.password && <p>{errors.email.password?.toString()}</p>}
-        </div>
-        <div>
-          <label htmlFor="name">이름</label>
-          <input {...register("name")} />
-        </div>
-        <button type="submit">회원가입</button>
+      <form onSubmit={handleSubmit(onSubmit)}style={{width: '100%', height: '100vh'}} className="flex flex-col justify-center items-center">
+          <div className="w-96 h-96 bg-orange-100 flex flex-col justify-center items-center rounded-3xl relative border-2 border-black">
+              <div className="absolute -top-5 left-50% text-3xl bg-white rounded-full">
+                Register
+              </div>
+              <input
+                {...register("email", { required: "이메일은 필수 항목입니다." })}
+                type="email"
+                placeholder="Email"
+                className="h-12 w-3/4 rounded-xl border-2 border-black text-black m-4"
+              />
+              {errors.email && <p>{errors.email.message?.toString()}</p>}
+              <input
+                {...register("password", { required: "비밀번호는 필수 항목입니다." })}
+                type="password"
+                placeholder="Password"
+                className="h-12 w-3/4 rounded-xl border-2 border-black text-black m-4"
+              />
+              {errors.password && <p>{errors.email.password?.toString()}</p>}
+              <input 
+                {...register("name")} 
+                placeholder="Name"
+                className="h-12 w-3/4 rounded-xl border-2 border-black text-black m-4"
+              />
+            <button type="submit" className="h-12 w-3/4 bg-blue-200 rounded-3xl text-white font-bold text-xl m-4">회원가입</button>
+          </div>
       </form>
     </div>
   );

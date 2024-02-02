@@ -24,26 +24,32 @@ export default function Login() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label htmlFor="email">이메일</label>
+    <form onSubmit={handleSubmit} style={{width: '100%', height: '100vh'}} className="flex flex-col justify-center items-center">
+        <div className="w-48 h-48 bg-yellow-200 fixed top-10 left-50% flex justify-center items-center">
+          <p className="text-sm font-bold">지금은 관리자만 사용 가능합니다.</p>
+        </div>
+       <div className="w-96 h-96 bg-orange-100 flex flex-col justify-center items-center rounded-3xl relative border-2 border-black">
+        <div className="absolute -top-5 left-50% text-3xl bg-white rounded-full">
+          Login
+        </div>
         <input
-          type="email"
-          id="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-      </div>
-      <div>
-        <label htmlFor="password">비밀번호</label>
-        <input
-          type="password"
-          id="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </div>
-      <button type="submit">로그인</button>
+            type="email"
+            id="email"
+            value={email}
+            placeholder='Email'
+            className="h-12 w-3/4 rounded-xl border-2 border-black text-black m-4"
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <input
+            type="password"
+            id="password"
+            value={password}
+            placeholder='Password'
+            className="h-12 w-3/4 rounded-xl border-2 border-black text-black m-4"
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        <button type="submit" className="h-12 w-3/4 bg-blue-200 rounded-3xl text-white font-bold text-xl m-4">로그인</button>
+       </div>
     </form>
   );
 }

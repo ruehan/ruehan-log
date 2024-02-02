@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useSession, signIn } from 'next-auth/react';
+import { useSession, signIn, signOut } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import useSWR, { mutate } from 'swr';
 import { marked } from 'marked';
@@ -8,14 +8,14 @@ import { RiMenuFoldLine as MenuFoldIcon, RiMenuUnfoldLine as MenuUnFoldIcon } fr
 import LoadingComponent from './components/Loader';
 import { useForm } from 'react-hook-form';
 import { itemVariants, typeVariants, variants } from '@/utils/motion';
-import { fetcher, unix_timestamp } from '@/utils/utils';
+import { unix_timestamp } from '@/utils/utils';
 import CustomAlertModal from './components/CustomAlertModal';
 
 export default function Home() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const { data: posts, error } = useSWR('/api/get-post', fetcher);
-  const { data: comments, error: cError } = useSWR('/api/get-comment', fetcher);
+  const { data: posts, error } = useSWR('/api/get-post');
+  const { data: comments, error: cError } = useSWR('/api/get-comment');
   const [selectedType, setSelectedType] = useState('잔디 심기');
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(0);
@@ -90,6 +90,7 @@ export default function Home() {
   const types = new Set(posts.getPost.map((post: any) => post.type));
   const filteredPosts = posts.getPost.filter((post: any) => post.type == selectedType);
   const titles = filteredPosts.map((post: { title: any; }) => post.title); 
+  
   const onClickType = (type: any) => {
     setSelectedType(type)
     setCurrent(0)
@@ -121,6 +122,8 @@ export default function Home() {
     await requestUpdateComment(e.target.id)
     mutate('/api/get-comment') 
   }
+
+  
   const clickDelete = async (e: any) => {
     await requestUpdate(e.target.id) 
     setCurrent(0)
@@ -207,11 +210,9 @@ export default function Home() {
       <button onClick={toggleTypes} className="fixed top-5 left-5 text-4xl bg-gray-500 text-white rounded-full z-50">
         {showType ? <MenuFoldIcon /> : <MenuUnFoldIcon />}
       </button>
-      <button onClick={() => router.push('/create-post')} className="fixed top-5 left-20 w-32 text-4xl bg-gray-500 text-white rounded-full z-50 font-nanum text-md">
-        포스트 생성
-      </button>
+      
       {showType && (
-        <div className="flex items-center justify-center bg-white ml-8 absolute h-full top-0 left-0 z-40 scrollbar-hide w-full lg:w-1/6 lg:bg-inherit">
+        <div className="flex items-center justify-center bg-white absolute h-full top-0 left-0 z-40 scrollbar-hide w-full lg:w-1/6 lg:bg-inherit">
           <motion.div
           initial="hidden"
           animate="visible"
@@ -255,20 +256,42 @@ export default function Home() {
       </motion.div>
         </div>
       )}  
+
+
+
       <div className="flex w-full lg:w-5/6 justify-center h-full overflow-hidden " >
-      <div className="fixed top-5 right-0 lg:sticky lg:right-0 flex flex-col w-12 h-72 justify-around items-center z-40 text-sm"> 
-                    {session && (                            
-                        <div className="flex flex-col w-12 md:w-16 h-32 justify-around items-center rounded-2xl border-2 border-red-200 ">
+                    {session && (    
+                            <div className="fixed top-5 right-5 lg:sticky lg:right-0 flex flex-col w-12 h-80 justify-around items-center z-40 text-sm">      
+                          <button onClick={() => router.push('/create-post')} className="fixed top-5 left-20 w-32 text-4xl bg-gray-500 text-white rounded-full z-50 font-nanum text-md">
+                          포스트 생성
+                        </button>                   
+                        <div className="flex flex-col w-12 md:w-16 h-48 justify-around items-center rounded-2xl">
+                          <button id={filteredPosts[current].id} onClick={() => signOut({redirect: false, callbackUrl: '/'})} className=" w-12 h-12 bg-red-200 rounded-full text-white text-xs">Signout</button>
                           <button id={filteredPosts[current].id} onClick={clickDelete} className=" w-12 h-12 bg-red-200 rounded-full text-white">X</button>
                           <button id={filteredPosts[current].id} onClick={clickEdit} className=" w-12 h-12 bg-red-200 rounded-full text-white">Edit</button>
-                        </div>                            
-                )}
-                    <div className="flex flex-col w-12 md:w-16 h-48 justify-around items-center rounded-2xl border-2 border-blue-200">
-                          <button onClick={handleSharePost} className="bg-blue-200 text-white rounded-full w-12 h-12">Share</button>
-                          <button onClick={scrollToTop} className="bg-blue-200 text-white rounded-full w-12 h-12">Top</button>
-                          <button onClick={scrollToBottom} className="bg-blue-200 text-white rounded-full w-12 h-12">Bottom</button>
-                        </div>
-          </div>
+                        </div>       
+                        <div className="flex flex-col w-12 md:w-16 h-48 justify-around items-center rounded-2xl ">
+                        <button onClick={handleSharePost} className="bg-blue-200 text-white rounded-full w-12 h-12">Share</button>
+                        <button onClick={scrollToTop} className="bg-blue-200 text-white rounded-full w-12 h-12">Top</button>
+                        <button onClick={scrollToBottom} className="bg-blue-200 text-white rounded-full w-12 h-12">Bottom</button>
+                         </div>       
+                         </div>            
+                    )}
+                    {!session && (
+                            <div className="fixed top-5 right-5 lg:sticky lg:right-0 flex flex-col w-12 h-72 justify-around items-center z-40 text-sm">      
+                            <div className="flex flex-col w-12 md:w-16 h-32 justify-around items-center rounded-2xl">
+                                <button id={filteredPosts[current].id} onClick={() => router.push("/login")} className=" w-12 h-12 bg-red-200 rounded-full text-white">SignIn</button>
+                                {/* <button id={filteredPosts[current].id} onClick={() => router.push("/register")} className=" w-12 h-12 bg-red-200 rounded-full text-white text-xs">Register</button> */}
+                              </div>
+                              <div className="flex flex-col w-12 md:w-16 h-48 justify-around items-center rounded-2xl ">
+                                <button onClick={handleSharePost} className="bg-blue-200 text-white rounded-full w-12 h-12">Share</button>
+                                <button onClick={scrollToTop} className="bg-blue-200 text-white rounded-full w-12 h-12">Top</button>
+                                <button onClick={scrollToBottom} className="bg-blue-200 text-white rounded-full w-12 h-12">Bottom</button>
+                              </div>  
+                            </div>
+                    )}
+                    
+         
         <div id="container" ref={containerRef} className="relative overflow-scroll w-3/4 flex flex-col justify-between items-center bg-white shadow-lg rounded-lg m-5 text-gray-800">          
           <AnimatePresence initial={false}>
             <motion.div

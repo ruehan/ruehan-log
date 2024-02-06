@@ -8,7 +8,7 @@ import { RiMenuFoldLine as MenuFoldIcon, RiMenuUnfoldLine as MenuUnFoldIcon } fr
 import LoadingComponent from './components/Loader';
 import { useForm } from 'react-hook-form';
 import { itemVariants, typeVariants, variants } from '@/utils/motion';
-import { unix_timestamp } from '@/utils/utils';
+import { isUpdated, unix_timestamp } from '@/utils/utils';
 import CustomAlertModal from './components/CustomAlertModal';
 
 export default function Home() {
@@ -222,7 +222,7 @@ export default function Home() {
           {[...types].map((type: any) => (
             <motion.div 
               key={type} 
-              className={`p-2 ${type === selectedType ? 'text-blue-500 font-bold' : 'text-gray-700'}`}
+              className={`p-2 text-xs ${type === selectedType ? 'text-blue-500 font-bold' : 'text-gray-700'}`}
               onClick={() => onClickType(type)}
               whileHover={{scale: 1.1}}
               whileTap={{scale: 0.95}}
@@ -238,7 +238,7 @@ export default function Home() {
         animate="visible"
         variants={typeVariants}
         transition={{ duration: 1 }}
-        className="flex flex-col w-36 justify-center h-3/4 overflow-scroll">
+        className="flex flex-col w-36 justify-center h-3/4 overflow-scroll text-xs">
         {titles.map((title: any, index: any) => (
           <motion.div
             variants={itemVariants}
@@ -250,14 +250,17 @@ export default function Home() {
             className={`p-2 border-l-2 ${index === current ? 'text-blue-500 font-bold' : 'text-gray-700'}`}
             onClick={() => paginate(index)}
           >
-            {title}
+            {
+              <div className="flex items-center relative">
+                <div className="z-10">{title}</div>
+                <div className={`w-full absolute bottom-0 h-2 ${isUpdated(filteredPosts[index].updatedAt) && 'bg-red-200'}`}></div>                    
+              </div>
+            }
           </motion.div>
         ))}
       </motion.div>
         </div>
       )}  
-
-
 
       <div className="flex w-full lg:w-5/6 justify-center h-full overflow-hidden " >
                     {session && (    

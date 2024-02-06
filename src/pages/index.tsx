@@ -8,7 +8,7 @@ import { RiMenuFoldLine as MenuFoldIcon, RiMenuUnfoldLine as MenuUnFoldIcon } fr
 import LoadingComponent from './components/Loader';
 import { useForm } from 'react-hook-form';
 import { itemVariants, typeVariants, variants } from '@/utils/motion';
-import { isUpdated, unix_timestamp } from '@/utils/utils';
+import { generateToken, isUpdated, unix_timestamp } from '@/utils/utils';
 import CustomAlertModal from './components/CustomAlertModal';
 
 export default function Home() {
@@ -16,7 +16,7 @@ export default function Home() {
   const router = useRouter();
   const { data: posts, error } = useSWR('/api/get-post');
   const { data: comments, error: cError } = useSWR('/api/get-comment');
-  const [selectedType, setSelectedType] = useState('잔디 심기');
+  const [selectedType, setSelectedType] = useState('유럽 한달 여행');
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(0);
   const [showType, setShowType] = useState(true);
@@ -88,6 +88,7 @@ export default function Home() {
     return <LoadingComponent />
   }
   const types = new Set(posts.getPost.map((post: any) => post.type));
+  console.log(types)
   const filteredPosts = posts.getPost.filter((post: any) => post.type == selectedType);
   const titles = filteredPosts.map((post: { title: any; }) => post.title); 
   
@@ -136,10 +137,15 @@ export default function Home() {
     return <LoadingComponent />
   }
   const onSubmit = async (data: any) => {
+
+    const token = generateToken();
+    localStorage.setItem('commentToken', token)
+
     try {
       const newData = {
         ...data,
-        postId: filteredPosts[current].id
+        postId: filteredPosts[current].id,
+        token
       }
       if(nickname == "ruehan" && session){
         const response = await fetch('/api/create-comment', {
@@ -176,8 +182,26 @@ export default function Home() {
 
   return (
     <>
-    <form onSubmit={handleSubmit(onSubmit)} className="fixed right-0 bottom-0 flex-1 h-screen overflow-hidden hidden lg:block lg:w-1/6 h-1/2  ">
-          <div className="absolute bottom-4 w-full flex flex-col justify-center items-center">
+    <form onSubmit={handleSubmit(onSubmit)} className="fixed right-0 bottom-0 flex-1 h-screen overflow-hidden hidden lg:block lg:w-1/6">       
+          <div className="h-5/6 overflow-scroll">
+            {comments.getComment && (
+              comments.getComment.map((comment: any) => (
+                comment.postId == filteredPosts[current].id ? (
+                  <div key={comment.id} className="flex flex-col font-nanum p-2 m-2 border-2 border-blue-100 rounded-xl">
+                    {(session || localStorage.getItem('commentToken') === comment.token) && ( // 관리자 또는 토큰이 일치하는 경우에만 삭제 버튼 표시
+                      <div id={comment.id} className="text-red-600 w-4 h-4" onClick={clickDelComment}>X</div>
+                    )}
+                    <div className="flex justify-between">
+                      <div className="text-lg">{comment.author == "ruehan" ? `👨‍💻 ${comment.author}` : comment.author}</div>
+                      <div>[{unix_timestamp(comment.createdAt)}]</div>
+                    </div>
+                    <div className="text-2xl">{comment.content}</div>
+                  </div>
+                ) : null
+              )))}
+          </div>
+
+          <div className="w-full h-1/6 flex flex-col justify-center items-center">
             <input 
               {...register('nickname')}
               placeholder='닉네임 입력..'
@@ -190,20 +214,6 @@ export default function Home() {
             />
             <button type="submit" className="w-1/2 h-8 p-4 mt-2 flex justify-center items-center border-2 bg-blue-300 text-white rounded-xl">댓글 등록</button>
           </div>
-          {comments.getComment.map((comment: any) => (
-            comment.postId == filteredPosts[current].id ? (
-              <div key={comment.id} className="flex flex-col font-nanum p-2 m-2 border-2 border-blue-100 rounded-xl">
-              {session && (
-                <div id={comment.id} className="text-red-600 w-4 h-4" onClick={clickDelComment}>X</div>
-              )}
-              <div className="flex justify-between">
-                <div className="text-lg">{comment.author == "ruehan" ? `👨‍💻 ${comment.author}` : comment.author}</div>
-                <div>[{unix_timestamp(comment.createdAt)}]</div>
-              </div>
-              <div className="text-2xl">{comment.content}</div>
-            </div>
-            ) : null
-          ))}
     </form>
     <div className="flex flex-col items-center md:flex-row w-full justify-center overflow-hidden" style={{height: '90vh'}} >
       <CustomAlertModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} message={`https://ruehan.com/?type=${selectedType.replaceAll(" ", "%20")}&postId=${current}`} />
@@ -283,7 +293,7 @@ export default function Home() {
                     {!session && (
                             <div className="fixed top-5 right-5 lg:sticky lg:right-0 flex flex-col w-12 h-72 justify-around items-center z-40 text-sm">      
                             <div className="flex flex-col w-12 md:w-16 h-32 justify-around items-center rounded-2xl">
-                                <button id={filteredPosts[current].id} onClick={() => router.push("/login")} className=" w-12 h-12 bg-red-200 rounded-full text-white">SignIn</button>
+                                <button onClick={() => router.push("/login")} className=" w-12 h-12 bg-red-200 rounded-full text-white">SignIn</button>
                                 {/* <button id={filteredPosts[current].id} onClick={() => router.push("/register")} className=" w-12 h-12 bg-red-200 rounded-full text-white text-xs">Register</button> */}
                               </div>
                               <div className="flex flex-col w-12 md:w-16 h-48 justify-around items-center rounded-2xl ">

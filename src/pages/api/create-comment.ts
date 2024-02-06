@@ -5,7 +5,7 @@ import { marked } from 'marked';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const { nickname, comment, postId } = req.body;
+    const { nickname, comment, postId, token } = req.body;
 
     try {
 
@@ -13,7 +13,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           data: {
             content: comment,
             author: nickname,
-            postId: parseInt(postId)
+            postId: parseInt(postId),
+            token: token
           },
         });
 

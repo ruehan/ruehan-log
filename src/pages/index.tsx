@@ -11,12 +11,24 @@ import { itemVariants, typeVariants, variants } from '@/utils/motion';
 import { generateToken, isUpdated, unix_timestamp } from '@/utils/utils';
 import CustomAlertModal from './components/CustomAlertModal';
 
+const renderer = new marked.Renderer();
+const originalImageRenderer = renderer.image;
+
+renderer.image = function(href, title, text) {
+  // originalImageRenderer 함수를 호출하여 기본 <img> 태그를 생성
+  const html = originalImageRenderer.call(this, href, title, text);
+  // <img> 태그에 loading="lazy" 속성 추가
+  return html.replace('<img', '<img loading="lazy"');
+};
+
+marked.setOptions({renderer})
+
 export default function Home() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const { data: posts, error } = useSWR('/api/get-post');
   const { data: comments, error: cError } = useSWR('/api/get-comment');
-  const [selectedType, setSelectedType] = useState('유럽 한달 여행');
+  const [selectedType, setSelectedType] = useState('HANGYU');
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(0);
   const [showType, setShowType] = useState(true);
@@ -24,6 +36,8 @@ export default function Home() {
   const containerRef = useRef<null | HTMLDivElement>(null);
   const { register, watch, setValue, handleSubmit, control } = useForm();
   let nickname = watch('nickname');
+
+
 
   const handleSharePost = () => {
     setModalOpen(true)
@@ -89,6 +103,7 @@ export default function Home() {
   }
   const types = new Set(posts.getPost.map((post: any) => post.type));
   console.log(types)
+  console.log(selectedType)
   const filteredPosts = posts.getPost.filter((post: any) => post.type == selectedType);
   const titles = filteredPosts.map((post: { title: any; }) => post.title); 
   
@@ -179,6 +194,8 @@ export default function Home() {
       console.error('댓글 추가 중 오류 발생:', error);
     }
   };
+
+
 
   return (
     <>

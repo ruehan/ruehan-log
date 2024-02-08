@@ -38,17 +38,19 @@ h1 {
 
 h2 {
   font-size: 2em;
+  color:cadetblue;
 }
 
 h3 {
   font-size: 1.67em;
+  color:darkkhaki
 }
 
 /* 단락 */
 p {
   margin-top: 0;
   margin-bottom: 16px;
-  font-size: 20px;
+  font-size: 22px;
 }
 
 /* 링크 */
@@ -74,6 +76,10 @@ code {
   font-size: 15px;
 }
 
+a{
+  color:#e96a00;
+}
+
 pre > code {
   display: block;
   padding: 8px;
@@ -91,10 +97,8 @@ blockquote {
 }
 
 img {
-  max-width: 60%;
+  max-width: 80%;
   height: auto;
-  /* width: 50%; */
-  /* padding: 10px; */
   border-radius: 20px;
 }
 
@@ -122,3 +126,4 @@ html {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+

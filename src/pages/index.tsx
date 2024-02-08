@@ -10,6 +10,7 @@ import { useForm } from 'react-hook-form';
 import { itemVariants, typeVariants, variants } from '@/utils/motion';
 import { generateToken, isUpdated, unix_timestamp } from '@/utils/utils';
 import CustomAlertModal from './components/CustomAlertModal';
+import Head from 'next/head';
 
 const renderer = new marked.Renderer();
 const originalImageRenderer = renderer.image;
@@ -18,7 +19,11 @@ renderer.image = function(href, title, text) {
   // originalImageRenderer 함수를 호출하여 기본 <img> 태그를 생성
   const html = originalImageRenderer.call(this, href, title, text);
   // <img> 태그에 loading="lazy" 속성 추가
-  return html.replace('<img', '<img loading="lazy"');
+  if(href != 'https://imagedelivery.net/CJyrB-EkqcsF2D6ApJzEBg/0539069c-3a8c-4327-2f11-e43a58e78800/public'){
+    return html.replace('<img', '<img loading="lazy"');
+  }else{
+    return html
+  }
 };
 
 marked.setOptions({renderer})
@@ -36,8 +41,6 @@ export default function Home() {
   const containerRef = useRef<null | HTMLDivElement>(null);
   const { register, watch, setValue, handleSubmit, control } = useForm();
   let nickname = watch('nickname');
-
-
 
   const handleSharePost = () => {
     setModalOpen(true)
@@ -199,6 +202,10 @@ export default function Home() {
 
   return (
     <>
+    <Head>
+        <link rel="preload" href="https://imagedelivery.net/CJyrB-EkqcsF2D6ApJzEBg/0539069c-3a8c-4327-2f11-e43a58e78800/public" as="image" />
+    </Head>
+    
     <form onSubmit={handleSubmit(onSubmit)} className="fixed right-0 bottom-0 flex-1 h-screen overflow-hidden hidden lg:block lg:w-1/6">       
           <div className="h-5/6 overflow-scroll">
             {comments.getComment && (
@@ -322,7 +329,7 @@ export default function Home() {
                     )}
                     
          
-        <div id="container" ref={containerRef} className="relative overflow-scroll w-3/4 flex flex-col justify-between items-center bg-white shadow-lg rounded-lg m-5 text-gray-800">          
+        <div id="container" ref={containerRef} className="relative overflow-scroll w-full lg:w-3/4 flex flex-col justify-between items-center bg-white shadow-lg rounded-lg m-5 text-gray-800">          
           <AnimatePresence initial={false}>
             <motion.div
               key={current}
@@ -338,7 +345,7 @@ export default function Home() {
                 {
                   <div key={filteredPosts[current].id} className="relative" >
                     <div className="px-6 py-4 pb-8 flex-1 font-nanum" >
-                      <div className="mb-4">
+                      <div className="mb-4 mt-8">
                         <div>게시 일자 : {unix_timestamp(filteredPosts[current].createdAt)}</div>
                         <div>마지막 업데이트 : {unix_timestamp(filteredPosts[current].updatedAt)}</div>
                       </div>

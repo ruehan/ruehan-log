@@ -26,14 +26,14 @@ export class Player {
     scaleY?: any;
     scaleZ?: any;
 
-    constructor(info: {name: string, width: number, height: number, depth: number, 
+    constructor(info: {name: string, width?: number, height?: number, depth?: number, 
         color?: string, scene: THREE.Scene,x?: number, y?: number, z?: number, modelSrc?: string, loader?: any,
         differenceY?: string, rotationX?: any, rotationY?: any, rotationZ?: any, mapSrc?: string,
         mass?: any, cannonMaterial?: any, cannonWorld?: any, scaleX?: any, scaleY?: any, scaleZ?: any}) {
         this.name = info.name;
-        this.width = info.width;
-        this.height = info.height;
-        this.depth = info.depth;
+        this.width = info.width || 1;
+        this.height = info.height || 1;
+        this.depth = info.depth || 1;
         this.color = info.color || 'white';
         this.differenceY = info.differenceY || '0.4';
         this.x = info.x || 0;
@@ -54,7 +54,7 @@ export class Player {
         const geometry = new THREE.BoxGeometry(this.width, this.height, this.depth);
         const material = new THREE.MeshBasicMaterial({
             transparent: true,
-            color: 'yellow',
+            color: 'blue',
             opacity: 0,
         });
 
@@ -98,7 +98,8 @@ export class Player {
             mass: this.mass,
             position: new CANNON.Vec3(this.x, this.y, this.z),
             shape: new CANNON.Box(new CANNON.Vec3(this.width / 2, this.height / 2, this.depth / 2)),
-            material: this.cannonMaterial
+            material: this.cannonMaterial,
+            
         });
 
         const quatX = new CANNON.Quaternion();

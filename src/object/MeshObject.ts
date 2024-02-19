@@ -11,26 +11,26 @@ export class MeshObject {
     height: number;
     depth: number;
     color?: string;
-    mesh: THREE.Mesh;
-    x?: number;
-    y?: number;
-    z?: number;
+    mesh!: THREE.Mesh;
+    x: number;
+    y: number;
+    z: number;
     differenceY?: string;
-    rotationX?: any;
-    rotationY?: any;
-    rotationZ?: any;
+    rotationX: number;
+    rotationY: number;
+    rotationZ: number;
     mass?: any;
     cannonBody?: any;
     cannonMaterial?: any;
     cannonWorld?: any;
-    scaleX?: any;
-    scaleY?: any;
-    scaleZ?: any;
+    scaleX: any;
+    scaleY: any;
+    scaleZ: any;
     cannonShape?: any;
     transparentMesh: any;
 
     constructor(info: {name: string, width: number, height: number, depth: number, 
-        color?: string, scene: THREE.Scene,x?: number, y?: number, z?: number, modelSrc?: string, loader?: any,
+        color?: string, scene: THREE.Scene, x?: number, y?: number, z?: number, modelSrc?: string, loader?: any,
         differenceY?: string, rotationX?: any, rotationY?: any, rotationZ?: any, mapSrc?: string,
         mass?: any, cannonMaterial?: any, cannonWorld?: any, scaleX?: any, scaleY?: any, scaleZ?: any,
         cannonShape?: AnyObject, geometry?: any}) {
@@ -61,7 +61,7 @@ export class MeshObject {
                 info.modelSrc,
                 (glb: any) => {
                     console.log(glb)
-                    glb.scene.traverse(child => {
+                    glb.scene.traverse((child: { isMesh: any; castShadow: boolean; }) => {
                         if(child.isMesh){
                             child.castShadow = true;
                         }
@@ -78,7 +78,7 @@ export class MeshObject {
                     this.transparentMesh = new THREE.Mesh(
                         geometry,
                         new THREE.MeshBasicMaterial({
-                            // color: 'yellow',
+                            color: 'yellow',
                             transparent: true,
                             opacity: 0,
                         })
@@ -101,7 +101,7 @@ export class MeshObject {
             const geometry = new THREE.BoxGeometry(this.width, this.height, this.depth);
             info.loader.load(
                 info.mapSrc,
-                texture => {
+                (texture: any) => {
                     const material = new THREE.MeshLambertMaterial({
                         map: texture
                     });
@@ -133,10 +133,7 @@ export class MeshObject {
             info.scene.add(this.mesh);
 
             this.setCannonBody();
-        }
-
-
-        
+        }     
     }
 
     setCannonBody(){

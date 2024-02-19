@@ -1,20 +1,16 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import * as THREE from 'three';
 // import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MeshObject } from '../../object/MeshObject';
 import * as CANNON from 'cannon-es';
 import { KeyController } from '@/object/KeyController';
 import { Player } from '@/object/Player';
-import { RiCreativeCommonsZeroFill } from 'react-icons/ri';
-import { itemVariants } from '@/utils/motion';
 import { TouchController } from '@/object/TouchController';
+import useStore from '@/utils/threeStore';
 
 const ThreeScene = () => {
-
   useEffect(() => {
-
     // Renderer
     const renderer = new THREE.WebGLRenderer({
         antialias: true
@@ -39,7 +35,7 @@ const ThreeScene = () => {
     //Controls
     // const controls = new OrbitControls(camera, renderer.domElement);
     const gltfLoader = new GLTFLoader();
-    const textureLoader = new THREE.TextureLoader();
+    // const textureLoader = new THREE.TextureLoader();
     const keyController = new KeyController();
     const touchController = new TouchController();
     
@@ -55,7 +51,6 @@ const ThreeScene = () => {
     scene.add(ambientLight, pointLight);
 
     // Cannon(Physics)
-
     const cannonWorld = new CANNON.World();
     cannonWorld.gravity.set(0, -10, 0);
 
@@ -151,7 +146,7 @@ const ThreeScene = () => {
     const desk = new MeshObject({
         scene,
         cannonWorld,
-        // cannonMaterial: defaultCannonMaterial,
+        cannonMaterial: defaultCannonMaterial,
         mass: 100,
         loader: gltfLoader,
         name: 'desk',
@@ -166,37 +161,37 @@ const ThreeScene = () => {
         modelSrc: '/models/desk.glb'
     });
 
-    const simpleTable = new MeshObject({
+    const desk2 = new MeshObject({
         scene,
-        loader: gltfLoader,
-        name: 'simpleTable',
-        width: 0.8,
-        height: 1,
-        depth: 1.97,
-        scaleX: 1,
-        scaleY: 0.8,
-        scaleZ: 1,
-        // cannonMaterial: defaultCannonMaterial,
         cannonWorld,
-        rotationY: THREE.MathUtils.degToRad(90),
+        cannonMaterial: defaultCannonMaterial,
         mass: 100,
-        modelSrc: '/models/table_1_all_metal.glb',
-        x: 2.65,
+        loader: gltfLoader,
+        name: 'desk2',
+        width: 0.75,
+        height: 1.04,
+        depth: 2.5,
+        scaleX: 1.1,
+        scaleY: 1.2,
+        scaleZ: 1.05,
+        x: 2.6,
         z: -1.6,
-    })
+        rotationY: THREE.MathUtils.degToRad(-90),
+        modelSrc: '/models/desk.glb'
+    });
 
     const chair = new MeshObject({
         scene,
         loader: gltfLoader,
         name: 'officeChair',
+        cannonWorld,
+        cannonMaterial: defaultCannonMaterial,
         width: 0.5,
         height: 0.5,
         depth: 0.5,
         x: 3.5,
         z: -1.7,
         y: 0.4,
-        // cannonMaterial: defaultCannonMaterial,
-        // cannonWorld,
         scaleX: 1.3,
         scaleY: 1.3,
         scaleZ: 1.3,
@@ -209,21 +204,19 @@ const ThreeScene = () => {
         scene,
         loader: gltfLoader,
         name: 'bookShelf',
+        cannonWorld,
+        cannonMaterial: defaultCannonMaterial,
         width: 1,
         height: 2.5,
         depth: 0.5,
         x: 2.5,
         z: 3.1,
-        // y: 0.4,
-        // cannonMaterial: defaultCannonMaterial,
-        // cannonWorld,
         scaleX: 0.04,
         scaleY: 0.04,
         scaleZ: 0.04,
         rotationY: THREE.MathUtils.degToRad(180),
         mass: 30,
         y: 0.4,
-        // differenceY: '0',
         modelSrc: '/models/book_shelf.glb'
     })
 
@@ -236,16 +229,14 @@ const ThreeScene = () => {
         depth: 0.5,
         x: 1,
         z: 3,
-        // y: 0.4,
-        // cannonMaterial: defaultCannonMaterial,
-        // cannonWorld,
+        cannonMaterial: defaultCannonMaterial,
+        cannonWorld,
         scaleX: 0.015,
         scaleY: 0.015,
         scaleZ: 0.015,
         rotationY: THREE.MathUtils.degToRad(180),
         mass: 30,
         y: 0.4,
-        // differenceY: '0',
         modelSrc: '/models/light_oak_bookshelf.glb'
     })
 
@@ -259,13 +250,12 @@ const ThreeScene = () => {
         x: 2.5,
         z: -0.35,
         y: 0.4,
-        // cannonMaterial: defaultCannonMaterial,
+        cannonMaterial: defaultCannonMaterial,
         cannonWorld,
         rotationY: THREE.MathUtils.degToRad(0),
         rotationX: THREE.MathUtils.degToRad(75),
         rotationZ: THREE.MathUtils.degToRad(90),
         mass: 30,
-        // differenceY: '0',
         modelSrc: '/models/jazz_bass.glb'
     })
 
@@ -279,16 +269,12 @@ const ThreeScene = () => {
         x: 2.6,
         z: -3,
         y: 1.4,
-        scaleX: 0.15,
-        scaleY: 0.15,
-        scaleZ: 0.15,
+        scaleX: 0.12,
+        scaleY: 0.12,
+        scaleZ: 0.12,
         cannonMaterial: defaultCannonMaterial,
         cannonWorld,
-        // rotationY: THREE.MathUtils.degToRad(0),
-        // rotationX: THREE.MathUtils.degToRad(75),
-        // rotationZ: THREE.MathUtils.degToRad(90),
         mass: 30,
-        // differenceY: '0',
         modelSrc: '/models/pc.glb'
     })
 
@@ -308,10 +294,7 @@ const ThreeScene = () => {
         cannonMaterial: defaultCannonMaterial,
         cannonWorld,
         rotationY: THREE.MathUtils.degToRad(100),
-        // rotationX: THREE.MathUtils.degToRad(75),
-        // rotationZ: THREE.MathUtils.degToRad(90),
         mass: 30,
-        // differenceY: '0',
         modelSrc: '/models/Laptop.glb'
     })
 
@@ -322,7 +305,7 @@ const ThreeScene = () => {
         width: 0.6,
         height: 0.6,
         depth: 0.5,
-        x: 2.85,
+        x: 2.88,
         z: -2.1,
         y: 1.4,
         scaleX: 0.23,
@@ -331,10 +314,7 @@ const ThreeScene = () => {
         cannonMaterial: defaultCannonMaterial,
         cannonWorld,
         rotationY: THREE.MathUtils.degToRad(70),
-        // rotationX: THREE.MathUtils.degToRad(75),
-        // rotationZ: THREE.MathUtils.degToRad(90),
         mass: 30,
-        // differenceY: '0',
         modelSrc: '/models/monitor.glb'
     })
 
@@ -354,10 +334,7 @@ const ThreeScene = () => {
         cannonMaterial: defaultCannonMaterial,
         cannonWorld,
         rotationY: THREE.MathUtils.degToRad(90),
-        // rotationX: THREE.MathUtils.degToRad(75),
-        // rotationZ: THREE.MathUtils.degToRad(90),
         mass: 30,
-        // differenceY: '0',
         modelSrc: '/models/Keyboard.glb'
     })
 
@@ -366,9 +343,6 @@ const ThreeScene = () => {
         cannonWorld,
         cannonMaterial: defaultCannonMaterial,
         name: 'player',
-        // width: 0.5,
-        // height: 1,
-        // depth: 0.5,
         x: 0,
         z: 1.5,
         mass: 50
@@ -412,14 +386,17 @@ const ThreeScene = () => {
 
     cannonObjects.push(ground, floor, wall1, wall2, wall3, );
 
-    let device;
+    const setDevices = useStore((state: { setDevice: any; }) => state.setDevice);
+    const device = useStore((state: { device: any; }) => state.device)
+
+    // let device;
     function setDevice(){
         const htmlElem = document.querySelector('html');
         if('ontouchstart' in document.documentElement && window.innerWidth < 1300){
-            device = 'mobile';
+            setDevices('mobile');
             htmlElem?.classList.add('touchevents')
         }else {
-            device = 'desktop';
+            setDevices('desktop');
             htmlElem?.classList.add('no-touchevents')
         }
     }
@@ -486,10 +463,8 @@ const ThreeScene = () => {
 
         for (const item of intersects){
             if(item.object.name === 'lamp'){
-                console.log(item.object.name)
                 break;
             }else if (item.object.name === 'roboticVaccum'){
-                console.log(item.object.name)
                 break;
             }
         }
@@ -525,7 +500,6 @@ const ThreeScene = () => {
                 }
             }
         }
-
         if(player.cannonBody){
             player.mesh.position.copy(player.cannonBody.position);
             player.x = player.cannonBody.position.x;
@@ -536,16 +510,12 @@ const ThreeScene = () => {
                 moveMobile();
             }else{
                 move();
-            }
-
-            
+            }  
         }
-    
-        moveCamera();
-        renderer.render(scene, camera);
-        renderer.setAnimationLoop(draw);
+            moveCamera();
+            renderer.render(scene, camera);
+            renderer.setAnimationLoop(draw);
         }
-    
         setDevice();
         draw();
 
@@ -553,7 +523,6 @@ const ThreeScene = () => {
 
    window.addEventListener('resize', setLayout)
    document.addEventListener('click', () => {
-    // document.body.requestPointerLock();
     if (device === 'mobile') return;
     canvas?.requestPointerLock();
    })
@@ -569,9 +538,7 @@ const ThreeScene = () => {
         if(document.body.dataset.mode === 'game'){
             checkIntersects();
         }
-    }
-    
-    
+    }   
    })
 
    document.addEventListener('pointerlockchange', () => {

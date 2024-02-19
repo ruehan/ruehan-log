@@ -1,11 +1,7 @@
 export class KeyController {
-    keys: string[]
-
-
+    keys: { [key: string]: boolean }
     constructor() {
-        this.keys = [];
-
-        
+        this.keys = {};      
         window.addEventListener('keydown', event => {
             this.keys[event.code] = true;
         })

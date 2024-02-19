@@ -11,20 +11,20 @@ export class Player {
     depth: number;
     color?: string;
     mesh: THREE.Mesh;
-    x?: number;
-    y?: number;
-    z?: number;
+    x: number;
+    y: number;
+    z: number;
     differenceY?: string;
-    rotationX?: any;
-    rotationY?: any;
-    rotationZ?: any;
+    rotationX: number;
+    rotationY: number;
+    rotationZ: number;
     mass?: any;
     cannonBody?: any;
     cannonMaterial?: any;
     cannonWorld?: any;
-    scaleX?: any;
-    scaleY?: any;
-    scaleZ?: any;
+    scaleX: any;
+    scaleY: any;
+    scaleZ: any;
 
     constructor(info: {name: string, width?: number, height?: number, depth?: number, 
         color?: string, scene: THREE.Scene,x?: number, y?: number, z?: number, modelSrc?: string, loader?: any,
@@ -36,7 +36,7 @@ export class Player {
         this.depth = info.depth || 1;
         this.color = info.color || 'white';
         this.differenceY = info.differenceY || '0.4';
-        this.x = info.x || 0;
+        this.x = info.x || 0 as number;
         this.y = info.y || this.height / 2 + Number(this.differenceY);
         this.z = info.z || 0;
         this.rotationX = info.rotationX || 0;

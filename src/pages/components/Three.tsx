@@ -10,6 +10,10 @@ import { TouchController } from '@/object/TouchController';
 import useStore from '@/utils/threeStore';
 
 const ThreeScene = () => {
+
+    const setDevices = useStore(state => state.setDevice);
+    const device = useStore((state: { device: any; }) => state.device)
+
   useEffect(() => {
     // Renderer
     const renderer = new THREE.WebGLRenderer({
@@ -116,6 +120,18 @@ const ThreeScene = () => {
         z: -3.4,
         color: '#da8f74'
     });
+
+    const board = new MeshObject({
+        scene,
+        cannonWorld,
+        cannonMaterial: defaultCannonMaterial,
+        name: 'board',
+        width:3,
+        height:1.5,
+        depth: 0.1,
+        y: 2,
+        z: -3.3
+    })
     
     const wall2 = new MeshObject({
         scene,
@@ -139,6 +155,18 @@ const ThreeScene = () => {
         height: 3,
         depth: 0.2,
         z: 3.4,
+        color: '#da8f74'
+    });
+
+    const wall4 = new MeshObject({
+        scene,
+        cannonWorld,
+        cannonMaterial: defaultCannonMaterial,
+        name: 'wall4',
+        width: 0.2,
+        height: 3,
+        depth: 6.8,
+        x: -4.9,
         color: '#da8f74'
     });
     
@@ -250,8 +278,6 @@ const ThreeScene = () => {
         x: 2.5,
         z: -0.35,
         y: 0.4,
-        cannonMaterial: defaultCannonMaterial,
-        cannonWorld,
         rotationY: THREE.MathUtils.degToRad(0),
         rotationX: THREE.MathUtils.degToRad(75),
         rotationZ: THREE.MathUtils.degToRad(90),
@@ -272,8 +298,6 @@ const ThreeScene = () => {
         scaleX: 0.12,
         scaleY: 0.12,
         scaleZ: 0.12,
-        cannonMaterial: defaultCannonMaterial,
-        cannonWorld,
         mass: 30,
         modelSrc: '/models/pc.glb'
     })
@@ -291,8 +315,6 @@ const ThreeScene = () => {
         scaleX: 0.12,
         scaleY: 0.12,
         scaleZ: 0.12,
-        cannonMaterial: defaultCannonMaterial,
-        cannonWorld,
         rotationY: THREE.MathUtils.degToRad(100),
         mass: 30,
         modelSrc: '/models/Laptop.glb'
@@ -311,11 +333,44 @@ const ThreeScene = () => {
         scaleX: 0.23,
         scaleY: 0.23,
         scaleZ: 0.23,
-        cannonMaterial: defaultCannonMaterial,
-        cannonWorld,
         rotationY: THREE.MathUtils.degToRad(70),
         mass: 30,
         modelSrc: '/models/monitor.glb'
+    })
+
+    const main_monitor = new MeshObject({
+        scene,
+        loader: gltfLoader,
+        name: 'main_monitor',
+        width: 0.6,
+        height: 0.6,
+        depth: 0.5,
+        x: 1.88,
+        z: -1.3,
+        y: 1.4,
+        scaleX: 0.23,
+        scaleY: 0.23,
+        scaleZ: 0.23,
+        rotationY: THREE.MathUtils.degToRad(90),
+        mass: 30,
+        modelSrc: '/models/main_monitor.glb'
+    })
+
+    const sub_monitor = new MeshObject({
+        scene,
+        loader: gltfLoader,
+        name: 'sub_monitor',
+        width: 0.6,
+        height: 0.6,
+        depth: 0.5,
+        x: 3.6,
+        z: -3.5,
+        y: 1.4,
+        scaleX: 0.23,
+        scaleY: 0.23,
+        scaleZ: 0.23,
+        mass: 30,
+        modelSrc: '/models/main_monitor.glb'
     })
 
     const keyboard = new MeshObject({
@@ -331,11 +386,61 @@ const ThreeScene = () => {
         scaleX: 0.1,
         scaleY: 0.1,
         scaleZ: 0.1,
-        cannonMaterial: defaultCannonMaterial,
-        cannonWorld,
         rotationY: THREE.MathUtils.degToRad(90),
         mass: 30,
         modelSrc: '/models/Keyboard.glb'
+    })
+
+    const sub_keyboard = new MeshObject({
+        scene,
+        loader: gltfLoader,
+        name: 'sub_keyboard',
+        width: 0.6,
+        height: 0.6,
+        depth: 0.5,
+        x: 3.6,
+        z: -2.85,
+        y: 1.4,
+        scaleX: 0.1,
+        scaleY: 0.1,
+        scaleZ: 0.1,
+        // rotationY: THREE.MathUtils.degToRad(90),
+        mass: 30,
+        modelSrc: '/models/Keyboard.glb'
+    })
+
+    const piano = new MeshObject({
+        scene,
+        loader: gltfLoader,
+        name: 'piano',
+        width: 0.6,
+        height: 0.6,
+        depth: 0.6,
+        scaleX: 0.2,
+        scaleY: 0.2,
+        scaleZ: 0.2,
+        x: -4.17,
+        z: -2.35,
+        y: 1.4,
+        modelSrc: '/models/ElectricPiano.glb'
+    })
+
+
+    const piano_table = new MeshObject({
+        scene,
+        loader: gltfLoader,
+        name: 'piano_table',
+        width: 0.6,
+        height: 0.6,
+        depth: 0.6,
+        scaleX: 0.35,
+        scaleY: 1.3,
+        scaleZ: 0.42,
+        y: 0,
+        x: -4.3,
+        z: -2.35,
+        differenceY: '0',
+        modelSrc: '/models/piano_table.glb'
     })
 
     const player = new Player({
@@ -386,8 +491,7 @@ const ThreeScene = () => {
 
     cannonObjects.push(ground, floor, wall1, wall2, wall3, );
 
-    const setDevices = useStore((state: { setDevice: any; }) => state.setDevice);
-    const device = useStore((state: { device: any; }) => state.device)
+
 
     // let device;
     function setDevice(){

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSession, signIn, signOut } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import useSWR, { mutate } from 'swr';
@@ -11,14 +11,13 @@ import { itemVariants, typeVariants, variants } from '@/utils/motion';
 import { generateToken, isUpdated, unix_timestamp } from '@/utils/utils';
 import CustomAlertModal from './components/CustomAlertModal';
 import Head from 'next/head';
+import { requestUpdate, requestUpdateComment } from '@/utils/api';
 
 const renderer = new marked.Renderer();
 const originalImageRenderer = renderer.image;
 
 renderer.image = function(href, title, text) {
-  // originalImageRenderer 함수를 호출하여 기본 <img> 태그를 생성
   const html = originalImageRenderer.call(this, href, title, text);
-  // <img> 태그에 loading="lazy" 속성 추가
   if(href != 'https://imagedelivery.net/CJyrB-EkqcsF2D6ApJzEBg/0539069c-3a8c-4327-2f11-e43a58e78800/public'){
     return html.replace('<img', '<img loading="lazy"');
   }else{
@@ -42,9 +41,9 @@ export default function Home() {
   const { register, watch, setValue, handleSubmit, control } = useForm();
   let nickname = watch('nickname');
 
-  const handleSharePost = () => {
+  const handleSharePost = useCallback(() => {
     setModalOpen(true)
-  }
+  }, [])
 
   const scrollToTop = () => {
     if (containerRef.current) {
@@ -68,9 +67,9 @@ export default function Home() {
     const {type, postId} = router.query;
 
     if(type && postId){
-      localStorage.setItem('selectedType', type);
-      localStorage.setItem('currentPostId', postId)
-      setSelectedType(type);
+      localStorage.setItem('selectedType', type as string);
+      localStorage.setItem('currentPostId', postId as string)
+      setSelectedType(type as string);
       setCurrent(Number(postId));
 
       router.replace(router.pathname, undefined, {shallow: true});
@@ -119,30 +118,12 @@ export default function Home() {
   const toggleTypes = () => {
     setShowType(!showType);
   }; 
-  const requestUpdate = async (id: any) => {
-    await fetch('/api/delete-post', {
-      method: 'POST',
-      body: JSON.stringify({ postId : id}),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-  }
-  const requestUpdateComment = async (id: any) => {
-    await fetch('/api/delete-comment', {
-      method: 'POST',
-      body: JSON.stringify({ commentId : id}),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-  }
+
   const clickDelComment = async (e: any) => {
     await requestUpdateComment(e.target.id)
     mutate('/api/get-comment') 
   }
 
-  
   const clickDelete = async (e: any) => {
     await requestUpdate(e.target.id) 
     setCurrent(0)
@@ -197,8 +178,6 @@ export default function Home() {
       console.error('댓글 추가 중 오류 발생:', error);
     }
   };
-
-
 
   return (
     <>

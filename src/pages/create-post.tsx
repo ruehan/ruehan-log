@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { marked } from 'marked';
 import DragAndDropUpload from './components/DragAndDrop';
 import { useRouter } from 'next/router';
+import { requestCreate } from '@/utils/api';
 
 marked.setOptions({
     gfm: true,
@@ -66,28 +67,6 @@ export default function PostEditor() {
   
   };
 
-  const onSubmit = async (data: any) => {
-    try {
-      const response = await fetch('/api/create-post', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error('포스트 생성 실패');
-      }
-
-      const result = await response.json();
-      console.log(result); 
-      router.push('/')
-    } catch (error) {
-      console.error('포스트 생성 중 에러 발생:', error);
-    }
-  };
-
   const handleKeyDown = (event: any) => {
     if (event.key === 'Enter') {
       // Nothing here now..
@@ -122,7 +101,7 @@ export default function PostEditor() {
       <button onClick={() => router.push('/')} className="w-16 h-8 bg-red-100 fixed top-4 left-4 rounded-xl">메인으로</button>
 
       <div className="flex-1 h-screen w-1/2 border-r-2">
-        <form onSubmit={handleSubmit(onSubmit)} className="flex-1 h-screen overflow-hidden">
+        <form onSubmit={handleSubmit(requestCreate)} className="flex-1 h-screen overflow-hidden">
           <button type="submit" className="w-full h-12 p-8 flex justify-center items-center">포스트 생성</button>
           <input 
             {...register('title')}

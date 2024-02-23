@@ -104,8 +104,6 @@ export default function Home() {
     return <LoadingComponent />
   }
   const types = new Set(posts.getPost.map((post: any) => post.type));
-  console.log(types)
-  console.log(selectedType)
   const filteredPosts = posts.getPost.filter((post: any) => post.type == selectedType);
   const titles = filteredPosts.map((post: { title: any; }) => post.title); 
   
@@ -184,7 +182,9 @@ export default function Home() {
     <Head>
         <link rel="preload" href="https://imagedelivery.net/CJyrB-EkqcsF2D6ApJzEBg/0539069c-3a8c-4327-2f11-e43a58e78800/public" as="image" />
     </Head>
-    
+
+    <button id={filteredPosts[current].id} onClick={() => router.push('/main')} className=" w-36 h-12 fixed left-4 bottom-4 bg-red-200 rounded-full text-white z-50 hidden lg:block">Virtual Room (BETA)</button>
+
     <form onSubmit={handleSubmit(onSubmit)} className="fixed right-0 bottom-0 flex-1 h-screen overflow-hidden hidden lg:block lg:w-1/6">       
           <div className="h-5/6 overflow-scroll">
             {comments.getComment && (

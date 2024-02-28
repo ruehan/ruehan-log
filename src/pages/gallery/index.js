@@ -1,31 +1,52 @@
 import { Canvas, useFrame } from '@react-three/fiber';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { easing } from 'maath';
 import {
   Image,
   Environment,
   ScrollControls,
   useScroll,
-  useTexture,
+  Float,
+  Plane,
 } from '@react-three/drei';
+import useSWR, { mutate } from 'swr';
 
 import * as THREE from 'three';
+import { Text } from '@react-three/drei';
+import { marked } from 'marked';
+import { Html } from '@react-three/drei';
 
 function Gallery() {
+  const [selectedImageUrl, setSelectedImageUrl] = useState(null);
+  const { data: posts, error } = useSWR('/api/get-post');
+
+  if (!posts) {
+    return null;
+  }
+
+  const selectedText = posts.getPost.find(
+    (pair) => pair.title === selectedImageUrl,
+  );
+
+  console.log(selectedText);
+
   return (
     <Canvas camera={{ position: [0, 0, 100], fov: 15 }}>
+      <gridHelper />
+      <axesHelper />
       <fog attach="fog" args={['#a79', 8.5, 12]} />
       <ScrollControls pages={4} infinite>
-        <Rig rotation={[0, 0, 0.15]}>
-          <Carousel />
+        <Rig selectedText rotation={[0, 0, 0.15]}>
+          <Carousel setSelectedImageUrl={setSelectedImageUrl} />
         </Rig>
       </ScrollControls>
       <Environment preset="dawn" background blur={0.5} />
+      {selectedText && <TextDisplay text={selectedText} />}
     </Canvas>
   );
 }
 
-function Rig(props) {
+function Rig(props, selectedText) {
   const ref = useRef(null);
   const scroll = useScroll();
 
@@ -59,11 +80,28 @@ const images = [
   'https://imagedelivery.net/CJyrB-EkqcsF2D6ApJzEBg/ff25be04-2306-4559-2172-b27694b74b00/public',
 ];
 
-function Carousel({ radius = 2, count = images.length }) {
+const country = [
+  '런던',
+  '파리',
+  '인터라켄',
+  '뮌헨',
+  '체스키크룸로프',
+  '프라하',
+  '빈',
+  '부다페스트',
+  '로마',
+  '피렌체',
+  '니스',
+  '바르셀로나',
+];
+
+function Carousel({ radius = 2, count = images.length, setSelectedImageUrl }) {
   return Array.from({ length: count }, (_, i) => (
     <Card
       key={i}
       url={images[i]}
+      country={country[i]}
+      onClick={setSelectedImageUrl}
       position={[
         Math.sin((i / count) * Math.PI * 2) * radius,
         0,
@@ -74,12 +112,15 @@ function Carousel({ radius = 2, count = images.length }) {
   ));
 }
 
-function Card({ url, ...props }) {
+function Card({ url, country, onClick, ...props }) {
   const ref = useRef();
   const [hovered, hover] = useState(false);
+  // const [rnd] = useState(() => Math.random());
   const pointerOver = (e) => (e.stopPropagation(), hover(true));
   const pointerOut = () => hover(false);
   useFrame((state, delta) => {
+    // ref.current.material.zoom =
+    //   2 + Math.sin(rnd * 10000 + state.clock.elapsedTime / 3) / 2;
     easing.damp3(ref.current.scale, hovered ? 1.15 : 1, 0.1, delta);
     easing.damp(
       ref.current.material,
@@ -94,14 +135,39 @@ function Card({ url, ...props }) {
     <Image
       ref={ref}
       url={url}
+      onClick={() => onClick(country)}
       transparent
       side={THREE.DoubleSide}
       onPointerOver={pointerOver}
       onPointerOut={pointerOut}
       {...props}
-    >
-      {/* <bentPlaneGeometry args={[0.1, 1, 1, 20, 20]} /> */}
-    </Image>
+    ></Image>
+  );
+}
+
+function TextDisplay({ text }) {
+  const ref = useRef();
+  useFrame((state, delta) => {
+    // 예를 들어, 객체를 회전시키는 등의 로직
+  });
+  return (
+    <mesh ref={ref} position={[0, 0, 0]}>
+      <Html fullscreen center>
+        <div
+          style={{
+            width: '700px',
+            height: '900px',
+            backgroundColor: 'white',
+            opacity: 0.9,
+            overflow: 'scroll',
+            borderRadius: '5%',
+          }}
+          dangerouslySetInnerHTML={{
+            __html: marked.parse(text.content || ''),
+          }}
+        />
+      </Html>
+    </mesh>
   );
 }
 

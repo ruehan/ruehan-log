@@ -8,6 +8,7 @@ function TriggerArea({
   size,
   characterRef,
   country,
+  setIsInsideZone,
 }) {
   const zoneRef = useRef();
   const enteredRef = useRef(false);
@@ -25,9 +26,11 @@ function TriggerArea({
       characterPosition.z <= zonePosition.z + size.depth / 2;
     if (isInside && !enteredRef.current) {
       onEnter(country);
+      setIsInsideZone(true);
       enteredRef.current = true;
     } else if (!isInside && enteredRef.current) {
       onLeave();
+      setIsInsideZone(false);
       enteredRef.current = false;
     }
   });
@@ -36,7 +39,7 @@ function TriggerArea({
     <mesh
       ref={zoneRef}
       position={[position[0], position[1] - 4, position[2] + 40]}
-      visible={true}
+      visible={false}
     >
       <boxGeometry args={[7, 0.1, 8]} />
       <meshBasicMaterial transparent opacity={0.2} color={'red'} />

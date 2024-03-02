@@ -39,12 +39,13 @@ const IMAGE_HEIGHT = 8; // 기본 이미지 높이
 const GAP = 0.5; // 이미지 간의 간격s
 const ROWS = 6; // 행의 수
 
-function Gallery({ characterRef }) {
+function Gallery({ characterRef, setIsInsideZone, setCountryName }) {
   const { viewport } = useThree();
   const rowWidth = viewport.width / 2; // 뷰포트 너비를 기준으로 행 너비 계산
 
   const handleEnterZone = (con) => {
     console.log(con);
+    setCountryName(con);
   };
 
   const handleLeaveZone = () => {};
@@ -67,13 +68,14 @@ function Gallery({ characterRef }) {
               IMAGE_HEIGHT={8}
             />
             <TriggerArea
-              key={index}
+              key={`${index}s`}
               country={country[index]}
               position={[x, y, z]}
               onEnter={handleEnterZone}
               onLeave={handleLeaveZone}
               size={{ width: 7, depth: 8 }}
               characterRef={characterRef}
+              setIsInsideZone={setIsInsideZone}
             />
           </>
         );

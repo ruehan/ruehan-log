@@ -39,7 +39,12 @@ const IMAGE_HEIGHT = 8; // 기본 이미지 높이
 const GAP = 0.5; // 이미지 간의 간격s
 const ROWS = 6; // 행의 수
 
-function Gallery({ characterRef, setIsInsideZone, setCountryName }) {
+function Gallery({
+  characterRef,
+  setIsInsideZone,
+  setCountryName,
+  artworkRef,
+}) {
   const { viewport } = useThree();
   const rowWidth = viewport.width / 2; // 뷰포트 너비를 기준으로 행 너비 계산
 
@@ -66,6 +71,10 @@ function Gallery({ characterRef, setIsInsideZone, setCountryName }) {
               url={url}
               position={new THREE.Vector3(x, y, z)}
               IMAGE_HEIGHT={8}
+              artworkRef={artworkRef}
+              country={country[index]}
+              index={index}
+              namePosition={[x, y, z]}
             />
             <TriggerArea
               key={`${index}s`}

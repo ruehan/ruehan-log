@@ -1,9 +1,4 @@
-import {
-  Html,
-  MeshReflectorMaterial,
-  OrbitControls,
-  Plane,
-} from '@react-three/drei';
+import { Html, MeshReflectorMaterial } from '@react-three/drei';
 import React, { useRef, Suspense, useEffect, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import MovingSphere from '../components/three/MovingSphere';
@@ -11,11 +6,11 @@ import Gallery from '../components/three/Gallery';
 import useSWR, { mutate } from 'swr';
 import { marked } from 'marked';
 import * as THREE from 'three';
+import TextContainer from '../components/three/TextContainer';
 
 function App() {
   const characterRef = useRef();
   const artworkRef = useRef();
-  const planeRef = useRef();
   const [blogPost, setBlogPost] = useState('');
   const [isEntered, setIsEntered] = useState(false);
   const [countryName, setCountryName] = useState('');
@@ -38,8 +33,6 @@ function App() {
       window.removeEventListener('resize', handleResize);
     };
   }, []);
-
-  console.log(planeSize);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -70,7 +63,6 @@ function App() {
       <Suspense fallback={null}>
         <ambientLight intensity={1} />
         <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
-
         <Gallery
           characterRef={characterRef}
           setIsInsideZone={setIsInsideZone}
@@ -78,7 +70,7 @@ function App() {
           artworkRef={artworkRef}
         />
         <mesh position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[150, 150]} />
+          <planeGeometry args={[500, 500]} />
           <MeshReflectorMaterial
             blur={[300, 100]}
             resolution={2048}
@@ -92,9 +84,7 @@ function App() {
             metalness={0.1}
           />
         </mesh>
-
         <MovingSphere characterRef={characterRef} />
-
         {isInsideZone && isEntered && (
           <mesh>
             <Html
@@ -111,12 +101,13 @@ function App() {
               }}
             >
               <div
-                className={'font-nanum p-4'}
+                className={'font-nanum p-4 expandAnimation'}
                 style={{
                   width: '100%',
                   height: '100%',
                   overflow: 'scroll',
                   backgroundColor: 'white',
+                  borderRadius: '10px',
                 }}
                 dangerouslySetInnerHTML={{
                   __html: marked.parse(blogPost || ''),
@@ -125,6 +116,7 @@ function App() {
             </Html>
           </mesh>
         )}
+        <TextContainer />
       </Suspense>
     </Canvas>
   );

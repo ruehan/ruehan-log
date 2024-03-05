@@ -60,7 +60,7 @@ function Gallery({
         const row = index % ROWS;
         const column = Math.floor(index / ROWS);
 
-        const x = (column % 2 === 0 ? 1 : -1) * (rowWidth / 2 - GAP / 2) * 2; // 열에 따라 x 위치 결정
+        const x = (column % 2 === 0 ? 1 : -1) * (rowWidth / 2 - GAP / 2) * 3; // 열에 따라 x 위치 결정
         const y = 4.2; // y 위치는 고정
         const z = -row * (IMAGE_HEIGHT + GAP) * 2; // 행에 따라 z 위치 결정
 

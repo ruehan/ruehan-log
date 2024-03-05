@@ -9,9 +9,10 @@ function TriggerArea({
   characterRef,
   country,
   setIsInsideZone,
+  // zoneRef,
 }) {
-  const zoneRef = useRef();
   const enteredRef = useRef(false);
+  const zoneRef = useRef();
 
   useFrame(() => {
     if (!characterRef.current) return;
@@ -39,7 +40,7 @@ function TriggerArea({
     <mesh
       ref={zoneRef}
       position={[position[0], position[1] - 4, position[2] + 40]}
-      visible={false}
+      visible={true}
     >
       <boxGeometry args={[7, 0.1, 8]} />
       <meshBasicMaterial transparent opacity={0.2} color={'red'} />

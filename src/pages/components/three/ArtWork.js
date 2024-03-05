@@ -38,7 +38,7 @@ function Artwork({
 
       <mesh>
         <Text
-          position={[-5, (IMAGE_HEIGHT + frameWidth) / 2 - 7, 1]} // 액자의 상단에 위치
+          position={[-5, (IMAGE_HEIGHT + frameWidth) / 2 - 7, 1]}
           fontSize={0.7}
         >
           {country}

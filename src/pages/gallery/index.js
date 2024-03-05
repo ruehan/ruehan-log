@@ -8,7 +8,7 @@ import { marked } from 'marked';
 import * as THREE from 'three';
 import TextContainer from '../components/three/TextContainer';
 
-function App() {
+function GalleryApp({ isActiveNum, isActive }) {
   const characterRef = useRef();
   const artworkRef = useRef();
   const [blogPost, setBlogPost] = useState('');
@@ -58,19 +58,25 @@ function App() {
   }, [isInsideZone]);
 
   return (
-    <Canvas camera={{ position: [7, 7, 7], fov: 75 }}>
-      <color attach="background" args={['#191920']} />
-      <Suspense fallback={null}>
-        <ambientLight intensity={1} />
-        <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
-        <Gallery
-          characterRef={characterRef}
-          setIsInsideZone={setIsInsideZone}
-          setCountryName={setCountryName}
-          artworkRef={artworkRef}
-        />
-        <mesh position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[500, 500]} />
+    // <Canvas camera={{ position: [7, 7, 7], fov: 75 }}>
+
+    <Suspense fallback={null}>
+      {isActiveNum == 2 && isActive && (
+        <>
+          <color attach="background" args={['#191920']} />
+          <ambientLight intensity={1} />
+          <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
+        </>
+      )}
+      <Gallery
+        characterRef={characterRef}
+        setIsInsideZone={setIsInsideZone}
+        setCountryName={setCountryName}
+        artworkRef={artworkRef}
+      />
+      <mesh position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[200, 200]} />
+        {isActiveNum == 2 && isActive && (
           <MeshReflectorMaterial
             blur={[300, 100]}
             resolution={2048}
@@ -83,43 +89,48 @@ function App() {
             color="#050505"
             metalness={0.1}
           />
-        </mesh>
-        <MovingSphere characterRef={characterRef} />
-        {isInsideZone && isEntered && (
-          <mesh>
-            <Html
-              position={[
-                characterRef.current.position.x,
-                characterRef.current.position.y - 1,
-                characterRef.current.position.z - 1,
-              ]}
-              rotation={[THREE.MathUtils.degToRad(-25), 0, 0]}
-              transform
-              style={{
-                width: `${planeSize[0] * 40}px`,
-                height: `${planeSize[1] * 35}px`,
-              }}
-            >
-              <div
-                className={'font-nanum p-4 expandAnimation'}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  overflow: 'scroll',
-                  backgroundColor: 'white',
-                  borderRadius: '10px',
-                }}
-                dangerouslySetInnerHTML={{
-                  __html: marked.parse(blogPost || ''),
-                }}
-              />
-            </Html>
-          </mesh>
         )}
-        <TextContainer />
-      </Suspense>
-    </Canvas>
+      </mesh>
+      <MovingSphere
+        characterRef={characterRef}
+        isActive={isActive}
+        isActiveNum={isActiveNum}
+      />
+      {isInsideZone && isEntered && (
+        <mesh>
+          <Html
+            position={[
+              characterRef.current.position.x,
+              characterRef.current.position.y - 1,
+              characterRef.current.position.z - 2,
+            ]}
+            rotation={[THREE.MathUtils.degToRad(-25), 0, 0]}
+            transform
+            style={{
+              width: `${planeSize[0] * 40}px`,
+              height: `${planeSize[1] * 45}px`,
+            }}
+          >
+            <div
+              className={'font-nanum p-4 expandAnimation'}
+              style={{
+                width: '100%',
+                height: '100%',
+                overflow: 'scroll',
+                backgroundColor: 'white',
+                borderRadius: '10px',
+              }}
+              dangerouslySetInnerHTML={{
+                __html: marked.parse(blogPost || ''),
+              }}
+            />
+          </Html>
+        </mesh>
+      )}
+      <TextContainer />
+    </Suspense>
+    // </Canvas>
   );
 }
 
-export default App;
+export default GalleryApp;
